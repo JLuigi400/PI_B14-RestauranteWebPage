@@ -4,12 +4,17 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Detectar desde dónde se está incluyendo
+$current_path = $_SERVER['PHP_SELF'];
+$is_in_direcciones = strpos($current_path, '/DIRECCIONES/') !== false;
+
+// Calcular prefijo de ruta
+$path = $is_in_direcciones ? "../" : "";
+
+// Variables de sesión
 $id_rol = $_SESSION['id_rol'] ?? 0;
 $nombre_usuario = $_SESSION['nick'] ?? 'Invitado';
 $is_logged = isset($_SESSION['id_usu']);
-
-// Prefijo para rutas (ajusta según tu estructura de carpetas)
-$path = ""; 
 ?>
 
 <nav class="main-navbar">
@@ -18,17 +23,17 @@ $path = "";
         
         <ul class="nav-links">
             <?php if ($is_logged): ?>
-                <li><a href="<?php echo $path; ?>dashboard.php">Inicio</a></li>
+                <li><a href="<?php echo $path; ?>DIRECCIONES/dashboard.php">Inicio</a></li>
 
                 <?php if ($id_rol == 1): // Administrador ?>
-                    <li><a href="<?php echo $path; ?>admin_usuarios.php">Usuarios</a></li>
-                    <li><a href="<?php echo $path; ?>validar_negocios.php">Validar</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/admin_usuarios.php">Usuarios</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/validar_negocios.php">Validar</a></li>
                 <?php elseif ($id_rol == 2): // Dueño de Restaurante ?>
-                    <li><a href="<?php echo $path; ?>gestion_platillos.php">Mi Menú</a></li>
-                    <li><a href="<?php echo $path; ?>inventario/inventario_crud.php">Inventario</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/gestion_platillos.php">Mi Menú</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/inventario.php">Inventario</a></li>
                 <?php elseif ($id_rol == 3): // Comensal ?>
-                    <li><a href="<?php echo $path; ?>buscar_restaurantes.php">Explorar</a></li>
-                    <li><a href="<?php echo $path; ?>mis_favoritos.php">Favoritos</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/buscar_restaurantes.php">Explorar</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/mis_favoritos.php">Favoritos</a></li>
                 <?php endif; ?>
                 
                 <li class="user-menu">
@@ -43,3 +48,8 @@ $path = "";
         </ul>
     </div>
 </nav>
+
+<!-- Debug Info (temporal) -->
+<!-- Current Path: <?php echo $current_path; ?> -->
+<!-- Is in DIRECCIONES: <?php echo $is_in_direcciones ? 'Yes' : 'No'; ?> -->
+<!-- Path Prefix: <?php echo $path; ?> -->

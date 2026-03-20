@@ -24,9 +24,9 @@ foreach ($extensiones as $ext) {
 echo "<h2>🗄️ Conexión a Base de Datos</h2>";
 try {
     // Intentar incluir el archivo de configuración
-    if (file_exists('PHP/db_config.php')) {
+    if (file_exists('db_config.php')) {
         echo "✅ Archivo db_config.php encontrado<br>";
-        include 'PHP/db_config.php';
+        include 'db_config.php';
         
         if (isset($conn) && $conn->ping()) {
             echo "✅ Conexión a MySQL exitosa<br>";
@@ -61,13 +61,13 @@ try {
 // 4. Verificar archivos críticos
 echo "<h2>📁 Archivos Críticos</h2>";
 $archivos = [
-    'index.html' => 'Página principal',
-    'login.php' => 'Login',
-    'signup.php' => 'Registro',
-    'PHP/navbar.php' => 'Navegación',
-    'PHP/db_config.php' => 'Config DB',
-    'PHP/validar_login.php' => 'Validación login',
-    'DIRECCIONES/dashboard.php' => 'Dashboard'
+    '../index.html' => 'Página principal',
+    '../login.php' => 'Login',
+    '../signup.php' => 'Registro',
+    'navbar.php' => 'Navegación',
+    'db_config.php' => 'Config DB',
+    'validar_login.php' => 'Validación login',
+    '../DIRECCIONES/dashboard.php' => 'Dashboard'
 ];
 
 foreach ($archivos as $archivo => $descripcion) {
@@ -77,7 +77,7 @@ foreach ($archivos as $archivo => $descripcion) {
 
 // 5. Verificar permisos de escritura
 echo "<h2>📂 Permisos de Escritura</h2>";
-$carpetas = ['UPLOADS', 'IMG', 'SaveStates'];
+$carpetas = ['../UPLOADS', '../IMG', '../SaveStates'];
 foreach ($carpetas as $carpeta) {
     if (file_exists($carpeta)) {
         $writable = is_writable($carpeta) ? "✅" : "❌";
@@ -89,9 +89,9 @@ foreach ($carpetas as $carpeta) {
 
 // 6. Verificar configuración de .htaccess
 echo "<h2>🔒 Configuración .htaccess</h2>";
-if (file_exists('.htaccess')) {
+if (file_exists('../.htaccess')) {
     echo "✅ Archivo .htaccess existe<br>";
-    $contenido = file_get_contents('.htaccess');
+    $contenido = file_get_contents('../.htaccess');
     if (strpos($contenido, 'Options -Indexes') !== false) {
         echo "⚠️ Tiene 'Options -Indexes' (puede causar problemas)<br>";
     }
@@ -114,7 +114,7 @@ echo "Session save path: " . session_save_path() . "<br>";
 echo "<h2>🎯 Prueba de Inclusión</h2>";
 try {
     echo "Probando incluir navbar.php...<br>";
-    include 'PHP/navbar.php';
+    include 'navbar.php';
     echo "✅ navbar.php incluido sin errores<br>";
 } catch (ParseError $e) {
     echo "❌ Error de sintaxis en navbar.php: " . $e->getMessage() . "<br>";

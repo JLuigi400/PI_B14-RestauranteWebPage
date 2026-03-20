@@ -9,6 +9,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre_insumo  = $_POST['nombre_insumo'];
     $stock_inv      = $_POST['stock_inv'];
     $medida_inv     = $_POST['medida_inv'];
+    $alergenos      = !empty($_POST['alergenos']) ? trim($_POST['alergenos']) : '';
+    $es_secreto     = isset($_POST['es_ingrediente_secreto']) ? 1 : 0;
     
     $ruta_final = "";
 
@@ -34,14 +36,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // 3. Inserción en la Base de Datos
     try {
-        $stmt = $conn->prepare("INSERT INTO inventario (id_res, nombre_insumo, stock_inv, medida_inv, img_insumo) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO inventario (id_res, nombre_insumo, stock_inv, medida_inv, img_insumo, alergenos, es_ingrediente_secreto) VALUES (?, ?, ?, ?, ?, ?, ?)");
         
-        // "isdss" = Integer, String, Double(decimal), String, String
-        $stmt->bind_param("isdss", $id_res, $nombre_insumo, $stock_inv, $medida_inv, $ruta_final);
+        // "isdsssi" = Integer, String, Double(decimal), String, String, String, Integer
+        $stmt->bind_param("isdsssi", $id_res, $nombre_insumo, $stock_inv, $medida_inv, $ruta_final, $alergenos, $es_secreto);
 
         if ($stmt->execute()) {
             // REDIRECCIÓN DE ÉXITO: Todo salió perfecto
-            header("Location: ../DIRECCIONES/inventario/inventario_crud.php?status=success");
+            header("Location: ../DIRECCIONES/inventario.php?status=success");
             exit();
         } else {
             // Si la ejecución falla, forzamos a que salte al bloque "catch"
@@ -50,12 +52,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } catch (Exception $e) {
         // REDIRECCIÓN DE ERROR: Atrapa el fallo de SQL y lo manda por la URL
         $error_msg = urlencode($e->getMessage());
-        header("Location: ../DIRECCIONES/inventario/inventario_crud.php?status=error&msg=$error_msg");
+        header("Location: ../DIRECCIONES/inventario.php?status=error&msg=$error_msg");
         exit();
     }
 } else {
     // 4. Seguridad: Si alguien intenta abrir este archivo escribiendo la URL directamente
-    header("Location: ../DIRECCIONES/inventario/inventario_crud.php");
+    header("Location: ../DIRECCIONES/inventario.php");
     exit();
 }
 ?>

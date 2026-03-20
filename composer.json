@@ -1,0 +1,48 @@
+{
+    "name": "jluigi400/pi-b14-restaurante-webpage",
+    "description": "Sistema de Gestión para Restaurantes - Ciudad Juárez",
+    "version": "1.0.0",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "JLuigi400",
+            "email": "contacto@restaurantesjuarez.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Restaurantes\\": "src/"
+        },
+        "files": [
+            "config.php"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit",
+        "serve": "php -S localhost:8000 -t ."
+    },
+    "keywords": [
+        "restaurantes",
+        "php",
+        "mysql",
+        "ciudad-juarez",
+        "gestion",
+        "web"
+    ],
+    "homepage": "https://github.com/JLuigi400/PI_B14-RestauranteWebPage",
+    "support": {
+        "issues": "https://github.com/JLuigi400/PI_B14-RestauranteWebPage/issues",
+        "source": "https://github.com/JLuigi400/PI_B14-RestauranteWebPage"
+    }
+}

@@ -28,5 +28,6 @@
         </div>
     </main>
     <script src="JS/auth.js"></script>
+    <script src="JS/session_check.js"></script>
 </body>
 </html>

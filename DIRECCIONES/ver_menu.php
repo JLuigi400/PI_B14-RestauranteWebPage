@@ -157,7 +157,9 @@ while ($row = $ingredientes->fetch_assoc()) {
                             <p class="sj-desc"><?php echo htmlspecialchars($p['descripcion_pla']); ?></p>
                             <div class="sj-row">
                                 <div class="sj-price">$<?php echo number_format((float)$p['precio_pla'], 2); ?></div>
-                                <?php if ($show_ing): ?><div class="sj-pill">👁️ Ingredientes</div><?php endif; ?>
+                                <?php if ($show_ing): ?>
+                                <button class="sj-pill" onclick="abrirModalIngredientes(<?php echo $p['id_pla']; ?>)">👁️ Ingredientes</button>
+                            <?php endif; ?>
                             </div>
 
                             <?php if ($show_ing): ?>
@@ -182,6 +184,137 @@ while ($row = $ingredientes->fetch_assoc()) {
             <p style="margin-top: 10px; color: var(--gris-suave);">Este restaurante aún no tiene platillos visibles.</p>
         <?php endif; ?>
     </main>
+
+    <!-- Modal de ingredientes -->
+    <div id="modalIngredientes" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModalIngredientes()">&times;</span>
+            <iframe id="iframeIngredientes" src="" width="100%" height="600" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function abrirModalIngredientes(idPla) {
+            const modal = document.getElementById('modalIngredientes');
+            const iframe = document.getElementById('iframeIngredientes');
+            
+            iframe.src = 'modales/modal_ingredientes_cliente.php?id_pla=' + idPla;
+            modal.style.display = 'block';
+            
+            // Ajustar tamaño del modal
+            setTimeout(function() {
+                ajustarTamanoModal();
+            }, 100);
+        }
+        
+        function cerrarModalIngredientes() {
+            const modal = document.getElementById('modalIngredientes');
+            const iframe = document.getElementById('iframeIngredientes');
+            
+            modal.style.display = 'none';
+            iframe.src = '';
+        }
+        
+        function ajustarTamanoModal() {
+            const modal = document.getElementById('modalIngredientes');
+            const iframe = document.getElementById('iframeIngredientes');
+            
+            // Escuchar mensajes del iframe para ajustar tamaño
+            window.addEventListener('message', function(event) {
+                if (event.data.type === 'resizeModal') {
+                    iframe.style.height = event.data.height + 'px';
+                    modal.style.height = 'auto';
+                }
+            });
+        }
+        
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalIngredientes');
+            if (event.target == modal) {
+                cerrarModalIngredientes();
+            }
+        }
+        
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                cerrarModalIngredientes();
+            }
+        });
+    </script>
+
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 20px auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            background: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .close:hover {
+            color: #000;
+            background: #f0f0f0;
+        }
+        
+        .sj-pill {
+            background: var(--azul-frontera);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .sj-pill:hover {
+            background: #1e3a5a;
+            transform: translateY(-1px);
+        }
+        
+        iframe {
+            border: none;
+            width: 100%;
+            min-height: 600px;
+        }
+    </style>
 </body>
 </html>
 

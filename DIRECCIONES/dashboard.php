@@ -5,7 +5,7 @@ include '../PHP/navbar.php';
 
 // Si no hay sesión, mandarlo al login
 if (!isset($_SESSION['id_usu'])) {
-    header("Location: ../login.html");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -20,6 +20,7 @@ $rol_nombre = $_SESSION['rol_nombre'];
     <?php include '../PHP/header_meta.php'; ?>
     <link rel="stylesheet" href="../CSS/stylesheet.css">
     <link rel="stylesheet" href="../CSS/navegador.css">
+    <script src="../JS/session_check.js"></script>
 </head>
 <body>
     <main class="container">
@@ -36,6 +37,8 @@ $rol_nombre = $_SESSION['rol_nombre'];
             <h2 style="margin: 8px 0 0 0;">Hola, <?php echo $_SESSION['nombre_completo']; ?></h2>
             
             <?php if ($id_rol == 1): // VISTA ADMINISTRADOR ?>
+                <?php include '../PHP/alertas/dashboard_alerts.php'; ?>
+                
                 <div class="sj-dashboard-cards">
                     <div class="sj-dash-card">
                         <h3>🛠️ Consola de Administración</h3>
@@ -48,13 +51,16 @@ $rol_nombre = $_SESSION['rol_nombre'];
                 </div>
 
             <?php elseif ($id_rol == 2): // VISTA DUEÑO / CHEF ?>
+                <?php include '../PHP/alertas/dashboard_alerts.php'; ?>
+                
                 <div class="sj-dashboard-cards">
                     <div class="sj-dash-card">
                         <h3>👨‍🍳 Gestión de Sucursal</h3>
                         <p>Administra tu menú, revisa tu inventario y mantén tu información al día.</p>
                         <div class="sj-dash-actions">
                             <a href="gestion_platillos.php" class="sj-action">🍽️ Mi Menú</a>
-                            <a href="inventario.php" class="sj-action">📦 Inventario</a>
+                            <a href="inventario/inventario_crud.php" class="sj-action">📦 Inventario</a>
+                            <a href="inventario/restock_inventario.php" class="sj-action">🛒 Re-stock</a>
                         </div>
                     </div>
                 </div>

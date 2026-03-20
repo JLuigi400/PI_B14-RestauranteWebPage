@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($stmt->execute()) {
             // REDIRECCIÓN DE ÉXITO: Todo salió perfecto
-            header("Location: ../DIRECCIONES/inventario.php?status=success");
+            header("Location: ../DIRECCIONES/inventario/inventario_crud.php?status=success");
             exit();
         } else {
             // Si la ejecución falla, forzamos a que salte al bloque "catch"
@@ -50,12 +50,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } catch (Exception $e) {
         // REDIRECCIÓN DE ERROR: Atrapa el fallo de SQL y lo manda por la URL
         $error_msg = urlencode($e->getMessage());
-        header("Location: ../DIRECCIONES/inventario.php?status=error&msg=$error_msg");
+        header("Location: ../DIRECCIONES/inventario/inventario_crud.php?status=error&msg=$error_msg");
         exit();
     }
 } else {
     // 4. Seguridad: Si alguien intenta abrir este archivo escribiendo la URL directamente
-    header("Location: ../DIRECCIONES/inventario.php");
+    header("Location: ../DIRECCIONES/inventario/inventario_crud.php");
     exit();
 }
 ?>

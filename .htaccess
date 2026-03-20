@@ -1,91 +1,17 @@
-# Configuración de Apache para Sistema de Restaurantes
+# Configuración básica para pruebas - Sin reglas complejas
 
-# Activar motor de reescritura
+# Activar motor de reescritura (básico)
 RewriteEngine On
 
-# Configuración de seguridad
-# Evitar listar directorios
-Options -Indexes
-
-# Seguridad para archivos sensibles
-<FilesMatch "^\.env">
+# Permitir acceso a archivos PHP
+<Files "*.php">
     Order allow,deny
-    Deny from all
-</FilesMatch>
+    Allow from all
+</Files>
 
-<FilesMatch "config\.php">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
+# Mostrar errores para depuración
+php_flag display_errors On
+php_value error_reporting E_ALL
 
-<FilesMatch "\.(log|sql|bak)$">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-
-# URLs amigables
-# Redirigir index.html a root
-RewriteCond %{THE_REQUEST} /index\.html [NC]
-RewriteRule ^(index\.html)?$ / [L,R=301]
-
-# URLs amigables para restaurantes (opcional)
-# RewriteRule ^restaurante/([0-9]+)/?$ DIRECCIONES/ver_menu.php?id=$1 [L,QSA]
-# RewriteRule ^buscar/?$ DIRECCIONES/buscar_restaurantes.php [L,QSA]
-
-# Configuración de cabeceras de seguridad
-<IfModule mod_headers.c>
-    # Protección contra clickjacking
-    Header always set X-Frame-Options "SAMEORIGIN"
-    
-    # Prevenir MIME type sniffing
-    Header always set X-Content-Type-Options "nosniff"
-    
-    # Habilitar XSS Protection
-    Header always set X-XSS-Protection "1; mode=block"
-    
-    # Política de seguridad de contenido (básica)
-    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';"
-</IfModule>
-
-# Configuración de PHP
-<IfModule mod_php.c>
-    # Límite de subida de archivos
-    upload_max_filesize 10M
-    post_max_size 10M
-    
-    # Tiempo de ejecución
-    max_execution_time 300
-    
-    # Mostrar errores (solo en desarrollo)
-    # php_flag display_errors Off
-    # php_value error_reporting E_ALL
-</IfModule>
-
-# Compresión gzip
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/plain
-    AddOutputFilterByType DEFLATE text/html
-    AddOutputFilterByType DEFLATE text/xml
-    AddOutputFilterByType DEFLATE text/css
-    AddOutputFilterByType DEFLATE application/xml
-    AddOutputFilterByType DEFLATE application/xhtml+xml
-    AddOutputFilterByType DEFLATE application/rss+xml
-    AddOutputFilterByType DEFLATE application/javascript
-    AddOutputFilterByType DEFLATE application/x-javascript
-</IfModule>
-
-# Caché de archivos estáticos
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresByType text/css "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 month"
-    ExpiresByType image/png "access plus 1 month"
-    ExpiresByType image/jpg "access plus 1 month"
-    ExpiresByType image/jpeg "access plus 1 month"
-    ExpiresByType image/gif "access plus 1 month"
-    ExpiresByType image/ico "access plus 1 month"
-    ExpiresByType image/svg+xml "access plus 1 month"
-</IfModule>
-
-# Página de error personalizada
-ErrorDocument 404 /error404.php
+# Configuración básica de seguridad
+# Sin bloqueos temporales para pruebas

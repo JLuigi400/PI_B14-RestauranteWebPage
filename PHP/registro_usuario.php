@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     
         $conn->commit();
-        echo "<script>alert('✅ Todo guardado correctamente para el ID: $id_generado'); window.location.href='../login.html';</script>";
+        echo "<script>alert('✅ Todo guardado correctamente para el ID: $id_generado'); window.location.href='../login.php';</script>";
 
     } catch (Exception $e) {
         $conn->rollback();

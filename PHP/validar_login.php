@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Guardamos las variables de sesión EXACTAMENTE como el dashboard las pide
             $_SESSION['id_usu']          = $user['id_usu'];
             $_SESSION['id_rol']          = $user['id_rol']; // Útil para validaciones PHP (Ej: if id_rol == 1)
-            $_SESSION['rol']             = $user['nombre_rol']; // El dashboard imprime esto
+            $_SESSION['rol_nombre']      = $user['nombre_rol']; // El dashboard espera esta variable
             $_SESSION['nick']            = $user['username_usu'];
             $_SESSION['nombre_completo'] = $user['nombre_per'] . " " . $user['apellidos_per'];
 

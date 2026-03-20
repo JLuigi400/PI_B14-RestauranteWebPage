@@ -4,7 +4,7 @@ include '../PHP/db_config.php';
 
 // Validar que el usuario haya iniciado sesión
 if (!isset($_SESSION['id_usu'])) {
-    header("Location: ../login.html");
+    header("Location: ../login.php");
     exit();
 }
 

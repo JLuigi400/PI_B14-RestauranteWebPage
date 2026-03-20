@@ -1,0 +1,161 @@
+/* Salud Juárez - Acceso (index/login/signup) */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+
+:root {
+  --fuente-principal: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+  background: radial-gradient(900px 360px at 12% 0%, rgba(45,90,39,0.18), rgba(45,90,39,0) 60%),
+              radial-gradient(760px 300px at 92% 10%, rgba(255,191,0,0.18), rgba(255,191,0,0) 55%),
+              var(--gris-fondo);
+}
+
+.sj-hero {
+  background: linear-gradient(120deg, rgba(34,48,66,0.94), rgba(45,90,39,0.92));
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--sombra-suave);
+}
+
+.sj-hero__inner {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 18px;
+  align-items: center;
+  padding: 28px 22px;
+  color: #fff;
+}
+
+.sj-hero__title {
+  margin: 0;
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+  line-height: 1.12;
+}
+
+.sj-hero__subtitle {
+  margin: 10px 0 0 0;
+  opacity: 0.95;
+  font-size: 1.02rem;
+}
+
+.sj-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.sj-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  font-size: 0.9rem;
+}
+
+.sj-cta {
+  display: grid;
+  gap: 10px;
+  justify-items: stretch;
+}
+
+.sj-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-weight: 800;
+  transition: 0.2s;
+}
+
+.sj-btn--primary { background: var(--verde-salud); color: #fff; }
+.sj-btn--primary:hover { background: var(--verde-oscuro); }
+
+.sj-btn--secondary {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.22);
+  color: #fff;
+}
+.sj-btn--secondary:hover { background: rgba(255,255,255,0.18); }
+
+.sj-panel {
+  margin-top: 16px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+/* Formularios (glass suave) */
+.sj-form-wrap {
+  max-width: 520px;
+  margin: 26px auto 0 auto;
+}
+
+.sj-form {
+  background: rgba(255,255,255,0.78);
+  border: 1px solid var(--borde-suave);
+  border-radius: 18px;
+  box-shadow: var(--sombra-suave);
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.sj-form h2 { margin: 0 0 14px 0; }
+
+.sj-field {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.sj-field label {
+  font-weight: 700;
+  color: var(--gris-texto);
+}
+
+.sj-field input,
+.sj-field select,
+.sj-field textarea {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--borde-suave);
+  background: rgba(255,255,255,0.95);
+  outline: none;
+}
+
+.sj-field input:focus,
+.sj-field select:focus,
+.sj-field textarea:focus {
+  border-color: rgba(46,90,136,0.45);
+  box-shadow: 0 0 0 4px rgba(46,90,136,0.14);
+}
+
+.sj-submit {
+  width: 100%;
+  margin-top: 14px;
+  border: none;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--verde-salud);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.sj-submit:hover { background: var(--verde-oscuro); }
+
+@media (max-width: 900px) {
+  .sj-hero__inner { grid-template-columns: 1fr; }
+}
+

@@ -1,0 +1,242 @@
+/* Salud Juárez - Cartillas de Menú + Gestión (platillos/inventario) */
+
+.sj-page-title {
+  margin: 18px 0 10px 0;
+  font-size: 1.6rem;
+}
+
+.sj-card {
+  background: rgba(255,255,255,0.9);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-15);
+  box-shadow: var(--sombra-suave);
+  padding: 18px;
+}
+
+.sj-divider {
+  border: 0;
+  border-top: 1px solid var(--borde-suave);
+  margin: 18px 0;
+}
+
+/* Formularios en grid 2 columnas */
+.sj-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.sj-form-grid .sj-span-2 { grid-column: span 2; }
+
+.sj-field {
+  display: grid;
+  gap: 6px;
+}
+
+.sj-field label {
+  font-weight: 800;
+  color: var(--gris-texto);
+}
+
+.sj-field input,
+.sj-field select,
+.sj-field textarea {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--borde-suave);
+  background: rgba(255,255,255,0.96);
+  outline: none;
+}
+
+.sj-field input:focus,
+.sj-field select:focus,
+.sj-field textarea:focus {
+  border-color: rgba(46,90,136,0.45);
+  box-shadow: 0 0 0 4px rgba(46,90,136,0.14);
+}
+
+.sj-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  color: var(--gris-texto);
+}
+
+.sj-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-weight: 900;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.sj-btn--primary { background: var(--verde-salud); color: #fff; }
+.sj-btn--primary:hover { background: var(--verde-oscuro); }
+.sj-btn--accent { background: rgba(46,90,136,0.12); border: 1px solid rgba(46,90,136,0.22); color: var(--gris-texto); }
+.sj-btn--accent:hover { background: rgba(46,90,136,0.18); }
+
+/* Grid de “cartillas” */
+.sj-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.sj-menu-card {
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-15);
+  overflow: hidden;
+  box-shadow: var(--sombra-suave);
+  transition: transform .15s ease, box-shadow .15s ease;
+  position: relative;
+}
+
+.sj-menu-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.10);
+}
+
+.sj-media {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: #eceff3;
+  overflow: hidden;
+}
+.sj-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sj-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #fff;
+  background: var(--verde-salud);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+}
+
+.sj-body {
+  padding: 14px 14px 16px 14px;
+}
+
+.sj-title {
+  margin: 0;
+  font-size: 1.06rem;
+}
+
+.sj-desc {
+  margin: 8px 0 10px 0;
+  color: var(--gris-suave);
+  font-size: 0.92rem;
+  min-height: 42px;
+}
+
+.sj-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sj-price {
+  color: var(--verde-salud);
+  font-weight: 900;
+  font-size: 1.12rem;
+}
+
+.sj-pill {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--azul-frontera);
+}
+
+/* Desplegable/Modal simple (details) */
+.sj-details {
+  margin-top: 10px;
+  border-radius: 14px;
+  background: rgba(45,90,39,0.06);
+  border: 1px solid rgba(45,90,39,0.18);
+  padding: 10px 12px;
+}
+
+.sj-details summary {
+  cursor: pointer;
+  font-weight: 900;
+  color: var(--gris-texto);
+  list-style: none;
+}
+.sj-details summary::-webkit-details-marker { display: none; }
+.sj-details summary::after {
+  content: "▾";
+  float: right;
+  color: var(--azul-frontera);
+}
+.sj-details[open] summary::after { content: "▴"; }
+
+.sj-details ul { margin: 10px 0 0 18px; }
+
+/* Tabla (inventario) “no aburrida” */
+.sj-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: var(--radio-15);
+  border: 1px solid var(--borde-suave);
+  background: rgba(255,255,255,0.92);
+}
+.sj-table th, .sj-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--borde-suave);
+  text-align: left;
+}
+.sj-table th {
+  background: rgba(46,90,136,0.10);
+  font-weight: 900;
+}
+.sj-table tr:hover td { background: rgba(255,191,0,0.08); }
+
+@media (max-width: 900px) {
+  .sj-form-grid { grid-template-columns: 1fr; }
+  .sj-form-grid .sj-span-2 { grid-column: span 1; }
+}
+
+.menu-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .form-platillo {
+            flex: 1;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .lista-platillos {
+            flex: 2;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .form-platillo input, .form-platillo select, .form-platillo button {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            box-sizing: border-box;
+        }

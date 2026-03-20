@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Salud Juárez | Inicio</title>
+    <link rel="stylesheet" href="CSS/stylesheet.css">
+    <link rel="stylesheet" href="CSS/navegador.css">
+    <link rel="stylesheet" href="CSS/inicio.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .landing { min-height: 100vh; display: grid; grid-template-rows: auto 1fr; }
+        .hero-wrap { padding: 26px 0 34px 0; }
+    </style>
+</head>
+<body>
+    <div class="landing">
+        <nav class="main-navbar">
+            <div class="nav-container">
+                <a href="index.html" class="nav-logo">🥗 Salud Juárez</a>
+                <ul class="nav-links">
+                    <li><a href="login.php">Iniciar Sesión</a></li>
+                    <li><a href="signup.php">Crear Cuenta</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="container hero-wrap">
+            <section class="sj-hero">
+                <div class="sj-hero__inner">
+                    <div>
+                        <h1 class="sj-hero__title">Comida saludable con sabor fronterizo</h1>
+                        <p class="sj-hero__subtitle">Descubre restaurantes en Ciudad Juárez, guarda tus favoritos y encuentra platillos que sí se antojan.</p>
+
+                        <div class="sj-chips">
+                            <span class="sj-chip">🌵 Juárez</span>
+                            <span class="sj-chip">🥬 Saludable</span>
+                            <span class="sj-chip">📍 Cerca de ti</span>
+                        </div>
+
+                        <div class="hero-note" style="margin-top:10px; opacity:0.9;">
+                            ¿Tienes restaurante? Regístrate como Dueño y gestiona tu menú e inventario.
+                        </div>
+                    </div>
+
+                    <div class="sj-cta">
+                        <a class="sj-btn sj-btn--primary" href="login.php">Entrar</a>
+                        <a class="sj-btn sj-btn--secondary" href="signup.php">Crear cuenta</a>
+                    </div>
+                </div>
+
+                <div class="sj-panel">
+                    <div style="font-weight:900; margin-bottom: 8px;">Muestra rápida (estática)</div>
+                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        <div style="background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.16); border-radius: 14px; padding: 12px;">
+                            <div style="font-weight:900;">Vegano / Saludable</div>
+                            <div style="opacity:0.9;">Ensaladas, bowls y snacks ligeros.</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.16); border-radius: 14px; padding: 12px;">
+                            <div style="font-weight:900;">Regional</div>
+                            <div style="opacity:0.9;">Sabor de casa, versión saludable.</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.16); border-radius: 14px; padding: 12px;">
+                            <div style="font-weight:900;">Parrilla</div>
+                            <div style="opacity:0.9;">Cortes y opciones balanceadas.</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; opacity: 0.9;">Hecho para la frontera. 💚</div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

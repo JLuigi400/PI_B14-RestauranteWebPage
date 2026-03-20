@@ -1,0 +1,83 @@
+/* Variables Globales */
+:root {
+    /* Paleta tríada (Salud Juárez) */
+    --verde-salud: #2D5A27;   /* Primario: Agave */
+    --verde-oscuro: #1F3E1B;
+    --amarillo-ambar: #FFBF00; /* Secundario: Ámbar */
+    --azul-frontera: #2E5A88;  /* Acento: Frontera */
+
+    /* Neutros */
+    --blanco-puro: #ffffff;
+    --fondo-arena: #FBF7EF;
+    --gris-fondo: var(--fondo-arena);
+    --gris-texto: #223042;
+    --gris-suave: #6A7787;
+    --borde-suave: rgba(34,48,66,0.10);
+
+    /* Estados */
+    --rojo-error: #E74C3C;
+
+    /* Tipografía */
+    --fuente-principal: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+    /* Radios / sombras */
+    --radio-12: 12px;
+    --radio-15: 15px;
+    --sombra-suave: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--fuente-principal);
+    background-color: var(--gris-fondo);
+    color: var(--gris-texto);
+    line-height: 1.6;
+}
+
+/* Clases de Utilidad */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.btn-principal {
+    background-color: var(--verde-salud);
+    color: white;
+    border: none;
+}
+
+.btn-principal:hover {
+    background-color: var(--verde-oscuro);
+}
+
+.tarjeta-oculta {
+    opacity: 0.5;
+    background-color: #f9f9f9;
+    filter: grayscale(100%);
+}
+
+.btn-mini {
+    padding: 5px 10px;
+    font-size: 0.8em;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.danger { background: #e74c3c; color: white; }
+.secondary { background: #95a5a6; color: white; }

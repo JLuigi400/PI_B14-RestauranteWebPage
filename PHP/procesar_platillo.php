@@ -82,6 +82,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if ($stmt->execute()) {
+            $id_pla = $conn->insert_id;
+            
+            // Procesar ingredientes del platillo
+            if (isset($_POST['ingredientes']) && is_array($_POST['ingredientes'])) {
+                foreach ($_POST['ingredientes'] as $ingrediente_data) {
+                    $id_inv = intval($ingrediente_data['id_inv']);
+                    $cantidad = floatval($ingrediente_data['cantidad']);
+                    $unidad = $ingrediente_data['unidad'] ?? '';
+                    
+                    if ($id_inv > 0 && $cantidad > 0) {
+                        $stmt_ing = $conn->prepare("
+                            INSERT INTO platillo_ingredientes (id_pla, id_inv, cantidad_usada, unidad_usada) 
+                            VALUES (?, ?, ?, ?)
+                            ON DUPLICATE KEY UPDATE 
+                            cantidad_usada = VALUES(cantidad_usada), 
+                            unidad_usada = VALUES(unidad_usada)
+                        ");
+                        $stmt_ing->bind_param("iids", $id_pla, $id_inv, $cantidad, $unidad);
+                        $stmt_ing->execute();
+                    }
+                }
+            }
+            
             // Mantener res_categorias alineado: si el dueño usa una categoría nueva, se vincula al restaurante.
             if ($id_cat > 0) {
                 $stmt_link = $conn->prepare("INSERT IGNORE INTO res_categorias (id_res, id_cat) VALUES (?, ?)");

@@ -64,19 +64,25 @@ $stmt_pla->bind_param("i", $id_res);
 $stmt_pla->execute();
 $platillos = $stmt_pla->get_result();
 
-// 3) Ingredientes disponibles (para mostrar solo si el platillo lo permite)
-$stmt_ing = $conn->prepare("
-    SELECT nombre_insumo, stock_inv, medida_inv
-    FROM inventario
-    WHERE id_res = ? AND stock_inv > 0
-    ORDER BY nombre_insumo ASC
-");
-$stmt_ing->bind_param("i", $id_res);
-$stmt_ing->execute();
-$ingredientes = $stmt_ing->get_result();
-$ingredientes_list = [];
-while ($row = $ingredientes->fetch_assoc()) {
-    $ingredientes_list[] = $row;
+// 3) Función para obtener ingredientes de un platillo específico
+function obtenerIngredientesPlatillo($conn, $id_pla) {
+    $stmt = $conn->prepare("
+        SELECT 
+            i.nombre_insumo, 
+            i.stock_inv, 
+            i.medida_inv,
+            i.es_ingrediente_secreto,
+            i.alergenos,
+            pi.cantidad_usada,
+            pi.unidad_usada
+        FROM platillo_ingredientes pi
+        JOIN inventario i ON i.id_inv = pi.id_inv
+        WHERE pi.id_pla = ? AND i.es_ingrediente_secreto = 0
+        ORDER BY i.nombre_insumo ASC
+    ");
+    $stmt->bind_param("i", $id_pla);
+    $stmt->execute();
+    return $stmt->get_result();
 }
 ?>
 
@@ -165,14 +171,68 @@ while ($row = $ingredientes->fetch_assoc()) {
                             <?php if ($show_ing): ?>
                                 <details class="sj-details">
                                     <summary>Ver ingredientes</summary>
-                                    <?php if (!empty($ingredientes_list)): ?>
-                                        <ul>
-                                            <?php foreach ($ingredientes_list as $ing): ?>
-                                                <li><?php echo htmlspecialchars($ing['nombre_insumo']); ?> (<?php echo htmlspecialchars($ing['stock_inv']); ?> <?php echo htmlspecialchars($ing['medida_inv']); ?>)</li>
-                                            <?php endforeach; ?>
-                                        </ul>
+                                    <?php 
+                                    $ingredientes_platillo = obtenerIngredientesPlatillo($conn, $p['id_pla']);
+                                    if ($ingredientes_platillo && $ingredientes_platillo->num_rows > 0): 
+                                        $total_kcal = 0;
+                                        $alergenos_encontrados = [];
+                                    ?>
+                                        <div style="margin-top: 10px;">
+                                            <div style="margin-bottom: 10px; font-weight: bold; color: #2c3e50;">📋 Ingredientes utilizados:</div>
+                                            <ul style="margin: 0; padding-left: 20px;">
+                                                <?php while ($ing = $ingredientes_platillo->fetch_assoc()): 
+                                                    // Calcular calorías estimadas
+                                                    $kcal_estimadas = $ing['cantidad_usada'] * 50; // 50 kcal por unidad base
+                                                    $total_kcal += $kcal_estimadas;
+                                                    
+                                                    // Recolectar alergenos
+                                                    if (!empty($ing['alergenos'])) {
+                                                        $alergenos_array = explode(',', $ing['alergenos']);
+                                                        foreach ($alergenos_array as $alergeno) {
+                                                            $alergeno_clean = trim($alergeno);
+                                                            if (!empty($alergeno_clean)) {
+                                                                $alergenos_encontrados[] = $alergeno_clean;
+                                                            }
+                                                        }
+                                                    }
+                                                ?>
+                                                    <li style="margin-bottom: 5px;">
+                                                        <strong><?php echo htmlspecialchars($ing['nombre_insumo']); ?></strong>
+                                                        <span style="color: #666; font-size: 0.9em;">
+                                                            (<?php echo number_format($ing['cantidad_usada'], 2); ?> <?php echo htmlspecialchars($ing['unidad_usada']); ?>)
+                                                        </span>
+                                                    </li>
+                                                <?php endwhile; ?>
+                                            </ul>
+                                            
+                                            <!-- Información nutricional -->
+                                            <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #3498db;">
+                                                <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px;">📊 Información Nutricional Estimada:</div>
+                                                <div style="color: #e74c3c; font-size: 1.1em; font-weight: bold; margin-bottom: 5px;">
+                                                    🍽️ Calorías totales: <?php echo number_format($total_kcal, 0); ?> kcal
+                                                </div>
+                                                
+                                                <?php if (!empty($alergenos_encontrados)): ?>
+                                                    <div style="margin-top: 8px;">
+                                                        <div style="font-weight: bold; color: #e74c3c; margin-bottom: 4px;">⚠️ Contiene alergenos:</div>
+                                                        <div>
+                                                            <?php 
+                                                            $alergenos_unicos = array_unique($alergenos_encontrados);
+                                                            foreach ($alergenos_unicos as $alergeno): 
+                                                            ?>
+                                                                <span style="background: #ff6b6b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin: 1px; display: inline-block;">
+                                                                    <?php echo htmlspecialchars($alergeno); ?>
+                                                                </span>
+                                                            <?php endforeach; ?>
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
                                     <?php else: ?>
-                                        <div style="margin-top:10px;">Este restaurante no tiene insumos con stock disponible.</div>
+                                        <div style="margin-top:10px; color: #666; font-style: italic;">
+                                            🥗 Este platillo no tiene ingredientes públicos registrados.
+                                        </div>
                                     <?php endif; ?>
                                 </details>
                             <?php endif; ?>

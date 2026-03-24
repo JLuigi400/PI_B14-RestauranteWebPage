@@ -28,9 +28,15 @@ $is_logged = isset($_SESSION['id_usu']);
                 <?php if ($id_rol == 1): // Administrador ?>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/admin_usuarios.php">Usuarios</a></li>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/validar_negocios.php">Validar</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/admin_ingredientes.php">Ingredientes</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/mapa_proveedores.php">Mapa</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/estado_sistema.php">Estado</a></li>
+                    <li><a href="<?php echo $path; ?>PHP/diagnosticar.php">🔍 Diagnóstico</a></li>
                 <?php elseif ($id_rol == 2): // Dueño de Restaurante ?>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/gestion_platillos.php">Mi Menú</a></li>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/inventario.php">Inventario</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/mis_restaurantes.php">Mis Restaurantes</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/proveedores_cercanos.php">Proveedores</a></li>
                 <?php elseif ($id_rol == 3): // Comensal ?>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/buscar_restaurantes.php">Explorar</a></li>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/mis_favoritos.php">Favoritos</a></li>

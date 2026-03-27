@@ -6,1131 +6,264 @@
     <link rel="stylesheet" href="CSS/stylesheet.css">
     <link rel="stylesheet" href="CSS/navegador.css">
     <link rel="stylesheet" href="CSS/inicio.css">
+    <link rel="stylesheet" href="CSS/index_styles.css">
+    <link rel="stylesheet" href="CSS/modal_theme.css">
+    <link rel="stylesheet" href="CSS/modal_social_icons.css">
+    <link rel="stylesheet" href="CSS/btn_desarrollador.css">
+    <link rel="stylesheet" href="CSS/carrusel_mejorado_fixed.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Descubre restaurantes saludables en Ciudad Juárez. Encuentra platillos nutritivos, guarda tus favoritos y disfruta comida deliciosa y saludable.">
     <meta name="keywords" content="restaurantes saludables, Ciudad Juárez, comida nutritiva, platillos saludables, dietas especiales">
-    <meta name="author" content="Salud Juárez - Lead Developer & UI/UX Designer">
+    <meta name="author" content="Salud Juárez - Jorge Anibal Espinosa Perales">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://saludjuarez.com/">
     <meta property="og:title" content="Salud Juárez | Restaurantes Saludables en Ciudad Juárez">
     <meta property="og:description" content="Descubre los mejores restaurantes saludables de Ciudad Juárez con información nutricional transparente.">
-    <meta property="og:image" content="IMG/UPLOADS/og-image.jpg">
+    <meta property="og:image" content="IMG/LOGOTIPOS/logo_salud_juarez.png">
     
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://saludjuarez.com/">
-    <meta property="twitter:title" content="Salud Juárez | Restaurantes Saludables">
-    <meta property="twitter:description" content="Encuentra restaurantes saludables en Ciudad Juárez con información nutricional completa.">
-    <meta property="twitter:image" content="IMG/UPLOADS/og-image.jpg">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Salud Juárez | Restaurantes Saludables">
+    <meta name="twitter:description" content="Descubre restaurantes saludables en Ciudad Juárez.">
+    <meta name="twitter:image" content="IMG/LOGOTIPOS/logo_salud_juarez.png">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="IMG/favicon.ico">
-    <link rel="apple-touch-icon" href="IMG/apple-touch-icon.png">
+    <link rel="icon" type="image/x-icon" href="IMG/LOGOTIPOS/favicon.ico">
+    <link rel="shortcut icon" href="IMG/LOGOTIPOS/favicon.ico">
     
-    <!-- Preload critical resources -->
-    <link rel="preload" href="JS/carrusel.js" as="script">
-    <link rel="preload" href="JS/qr_portfolio.js" as="script">
-    <link rel="preload" href="JS/mapa_salud_juarez.js" as="script">
-    
-    <style>
-        .landing { min-height: 100vh; display: grid; grid-template-rows: auto 1fr; }
-        .hero-wrap { padding: 26px 0 34px 0; }
-        
-        /* Variables CSS Industrial Dark */
-        :root {
-            --industrial-dark: #1a1a1a;
-            --industrial-medium: #2d2d2d;
-            --industrial-light: #404040;
-            --accent-primary: #27ae60;
-            --accent-secondary: #f39c12;
-            --accent-danger: #e74c3c;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --text-muted: #808080;
-        }
-        
-        /* Estilos adicionales para nuevas secciones */
-        .carrusel-section {
-            padding: 40px 0;
-            background: linear-gradient(135deg, var(--industrial-dark) 0%, var(--industrial-medium) 100%);
-        }
-        
-        .mapa-section {
-            padding: 40px 0;
-            background: var(--industrial-dark);
-            position: relative;
-        }
-        
-        .contenido-informativo {
-            padding: 60px 0;
-            background: linear-gradient(180deg, var(--industrial-medium) 0%, var(--industrial-dark) 100%);
-        }
-        
-        .desarrollador-section {
-            padding: 60px 0;
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            border-top: 2px solid var(--accent-primary);
-        }
-        
-        .footer-global {
-            background: var(--industrial-dark);
-            border-top: 1px solid var(--industrial-light);
-            padding: 40px 0 20px;
-        }
-        
-        /* Optimización de rendimiento */
-        .lazy-load {
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .lazy-load.loaded {
-            opacity: 1;
-        }
-    </style>
+    <!-- Preload crítico -->
+    <link rel="preload" href="CSS/carrusel_mejorado_fixed.css" as="style">
+    <link rel="preload" href="JS/carrusel_unificado.js" as="script">
 </head>
 <body>
-    <div class="landing">
-        <nav class="main-navbar">
-            <div class="nav-container">
-                <a href="index.html" class="nav-logo">
-                    <span class="logo-icon">🥗</span>
-                    <span class="logo-text">Salud Juárez</span>
-                </a>
-                <ul class="nav-links">
-                    <li><a href="login.php">Iniciar Sesión</a></li>
-                    <li><a href="signup.php">Crear Cuenta</a></li>
-                </ul>
-            </div>
-        </nav>
+    <!-- Navbar Inline (sin PHP) -->
+    <nav class="main-navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <span class="logo-icon">🥗</span>
+                <span class="logo-text">Salud Juárez</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="login.php">Iniciar Sesión</a></li>
+                <li><a href="signup.php">Crear Cuenta</a></li>
+                <li>
+                    <button id="btnOpenDevModal" class="btn-developer">
+                        <span class="btn-icon">👨‍💻</span>
+                        <span class="btn-text">Acerca del Desarrollador</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-        <main class="container hero-wrap">
-            <section class="sj-hero">
-                <div class="sj-hero__inner">
-                    <div>
-                        <h1 class="sj-hero__title">Comida saludable con sabor fronterizo</h1>
-                        <p class="sj-hero__subtitle">Descubre restaurantes en Ciudad Juárez, guarda tus favoritos y encuentra platillos que sí se antojan.</p>
-
-                        <div class="sj-chips">
-                            <span class="sj-chip">🌵 Juárez</span>
-                            <span class="sj-chip">🥬 Saludable</span>
-                            <span class="sj-chip">📍 Cerca de ti</span>
-                            <span class="sj-chip">🏆 Certificado</span>
-                        </div>
-
-                        <div class="hero-note" style="margin-top:10px; opacity:0.9;">
-                            ¿Tienes restaurante? Regístrate como Dueño y gestiona tu menú e inventario.
-                        </div>
+    <!-- Hero Section -->
+    <main class="container hero-wrap">
+        <section class="sj-hero">
+            <div class="sj-hero__inner">
+                <div>
+                    <h1 class="sj-hero__title">
+                        <span class="title-gradient">🥗</span>
+                        <span>Comida Saludable con Sabor Fronterizo</span>
+                    </h1>
+                    <p class="sj-hero__subtitle">
+                        Descubre restaurantes certificados en Ciudad Juárez y disfruta platillos nutritivos deliciosos
+                    </p>
+                    <div class="sj-hero__cta">
+                        <a href="DIRECCIONES/buscar_restaurantes.php" class="btn btn-primary btn-large">
+                            🗺️ Explorar Restaurantes
+                        </a>
+                        <a href="login.php" class="btn btn-secondary btn-large">
+                            👤 Iniciar Sesión
+                        </a>
                     </div>
-
-                    <div class="sj-cta">
-                        <a class="sj-btn sj-btn--primary" href="login.php">Entrar</a>
-                        <a class="sj-btn sj-btn--secondary" href="signup.php">Crear cuenta</a>
-                    </div>
-                </div>
-
-                <div class="sj-panel">
-                    <div style="font-weight:900; margin-bottom: 8px;">Muestra rápida (estática)</div>
-                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                        <div style="background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.16); border-radius: 14px; padding: 12px;">
-                            <div style="font-weight:900;">Vegano / Saludable</div>
-                            <div style="opacity:0.9;">Ensaladas, bowls y snacks ligeros.</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.16); border-radius: 14px; padding: 12px;">
-                            <div style="font-weight:900;">Regional</div>
-                            <div style="opacity:0.9;">Sabor de casa, versión saludable.</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.16); border-radius: 14px; padding: 12px;">
-                            <div style="font-weight:900;">Parrilla</div>
-                            <div style="opacity:0.9;">Cortes y opciones balanceadas.</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 10px; opacity: 0.9;">Hecho para la frontera. 💚</div>
-                </div>
-            </section>
-        </main>
-        
-        <!-- Carrusel Dinámico de Restaurantes Oro -->
-        <section class="carrusel-section">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="title-icon">🏆</span>
-                        Restaurantes con Certificación Oro
-                    </h2>
-                    <p class="section-subtitle">Los mejores establecimientos saludables de Ciudad Juárez, validados por nuestro sistema de certificación nutricional.</p>
-                </div>
-                
-                <div class="carrusel-container">
-                    <div class="swiper">
-                        <div class="swiper-wrapper" id="swiper-wrapper">
-                            <!-- Los slides se generarán dinámicamente -->
-                        </div>
-                        <div class="swiper-pagination"></div>
-                        <div class="swiper-button-next"></div>
-                        <div class="swiper-button-prev"></div>
+                    
+                    <div class="hero-note" style="margin-top:10px; opacity:0.9;">
+                        ¿Tienes restaurante? Regístrate como Dueño y gestiona tu menú e inventario.
                     </div>
                 </div>
             </div>
         </section>
-        
-        <!-- Sección de Mapa Interactivo -->
-        <section class="mapa-section">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="title-icon">🗺️</span>
-                        Explora Restaurantes Cerca de Ti
-                    </h2>
-                    <p class="section-subtitle">Encuentra restaurantes saludables cercanos y descubre proveedores para alianzas de negocio.</p>
-                </div>
-                
-                <div class="mapa-container">
-                    <div id="mapaIndex" class="mapa-wrapper" style="height: 500px; border-radius: 12px; overflow: hidden;">
-                        <!-- El mapa se inicializará con JavaScript -->
-                    </div>
-                    
-                    <div class="mapa-controles">
-                        <div class="mapa-legend">
-                            <h4>Leyenda</h4>
-                            <div class="legend-item">
-                                <span class="legend-marker restaurante">🍽️</span>
-                                <span>Restaurantes</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-marker premium">🏆</span>
-                                <span>Certificación Oro</span>
-                            </div>
-                            <div class="legend-item proveedor-item">
-                                <span class="legend-marker proveedor">📦</span>
-                                <span>Proveedores</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mapa-filtros">
-                            <button class="btn-mapa btn-mapa--active" onclick="toggleCapa('restaurantes')">
-                                <span>🍽️</span>
-                                Restaurantes
-                            </button>
-                            <button class="btn-mapa" onclick="toggleCapa('proveedores')">
-                                <span>📦</span>
-                                Proveedores
-                            </button>
-                            <button class="btn-mapa" onclick="toggleCapa('premium')">
-                                <span>🏆</span>
-                                Solo Oro
-                            </button>
-                        </div>
-                    </div>
-                </div>
+    </main>
+
+    <!-- Carrusel con Plantilla de Clonación -->
+    <section class="sj-restaurantes">
+        <div class="container">
+            <div class="carrusel-header">
+                <h2 class="carrusel-titulo">🌟 Restaurantes Certificados</h2>
+                <p class="carrusel-subtitulo">Descubre los mejores establecimientos con certificación nutricional</p>
             </div>
-        </section>
-        
-        <!-- Sección de Contenido Informativo -->
-        <section class="contenido-informativo">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="title-icon">🔬</span>
-                        Transparencia Nutricional
-                    </h2>
-                    <p class="section-subtitle">Entiende cómo calculamos alérgenos y por qué la transparencia es fundamental para tu salud.</p>
-                </div>
+            
+            <div class="carrusel-wrapper">
+                <!-- Controles de navegación -->
+                <button class="carrusel-control prev" aria-label="Anterior">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+                <button class="carrusel-control next" aria-label="Siguiente">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
                 
-                <div class="info-grid">
-                    <div class="info-card">
-                        <div class="info-icon">🔍</div>
-                        <h3>Detección de Alérgenos</h3>
-                        <p>Nuestro sistema analiza cada ingrediente y detecta automáticamente los 8 alérgenos principales: gluten, lactosa, frutos secos, huevo, pescado, mariscos, soja y sésamo.</p>
-                        <div class="info-badge">Automático</div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <div class="info-icon">📊</div>
-                        <h3>Cálculo de Calorías</h3>
-                        <p>Calculamos las calorías exactas sumando cada ingrediente con su cantidad utilizada, proporcionándote información precisa para tomar decisiones informadas.</p>
-                        <div class="info-badge">Preciso</div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <div class="info-icon">🔒</div>
-                        <h3>Ingredientes Secretos</h3>
-                        <p>Identificamos ingredientes que los restaurantes prefieren mantener en secreto, permitiéndote conocer exactamente qué consumes.</p>
-                        <div class="info-badge">Transparente</div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <div class="info-icon">🏆</div>
-                        <h3>Certificación Salud</h3>
-                        <p>Nuestro sistema de certificación evalúa cada restaurante basándose en criterios nutricionales, transparencia y calidad de ingredientes.</p>
-                        <div class="info-badge">Confiable</div>
-                    </div>
-                </div>
-                
-                <div class="info-cta">
-                    <h3>¿Por qué es importante?</h3>
-                    <p>La transparencia nutricional te permite tomar decisiones informadas sobre tu alimentación, evitando alérgenos, controlando calorías y descubriendo opciones realmente saludables.</p>
-                    <div class="cta-buttons">
-                        <a href="signup.php" class="btn-cta btn-cta--primary">Únete Ahora</a>
-                        <a href="login.php" class="btn-cta btn-cta--secondary">Ver Restaurantes</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Sección Sobre el Desarrollador -->
-        <section class="desarrollador-section">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="title-icon">👨‍💻</span>
-                        Sobre el Desarrollador
-                    </h2>
-                    <p class="section-subtitle">Conoce al creador de esta plataforma de salud alimentaria.</p>
-                </div>
-                
-                <div class="desarrollador-profile">
-                    <div class="profile-card">
-                        <div class="profile-avatar">
-                            <div class="avatar-placeholder">👨‍💻</div>
-                            <div class="avatar-badge">🎨</div>
-                        </div>
-                        
-                        <div class="profile-info">
-                            <h3 class="profile-name">[Tu Nombre Completo]</h3>
-                            <p class="profile-role">Lead Developer & UI/UX Designer</p>
-                            <p class="profile-education">🎓 Estudiante de Diseño Digital (DDMI)</p>
-                            
-                            <div class="profile-skills">
-                                <h4>Especialidades</h4>
-                                <div class="skills-grid">
-                                    <span class="skill-tag">🎨 Ilustración Digital</span>
-                                    <span class="skill-tag">💻 Desarrollo Full-stack</span>
-                                    <span class="skill-tag">🎯 UI/UX Design</span>
-                                    <span class="skill-tag">📱 Mobile-First</span>
-                                    <span class="skill-tag">🔧 PHP & MySQL</span>
-                                    <span class="skill-tag">⚡ JavaScript</span>
+                <div class="carrusel-contenedor">
+                    <div class="carrusel-track" id="carrusel-track">
+                        <!-- Plantilla de Slide (oculta) -->
+                        <div class="carrusel-slide slide-plantilla" style="display: none;">
+                            <div class="slide-card">
+                                <div class="slide-imagen">
+                                    <img class="slide-img" src="" alt="" loading="lazy" style="object-fit: cover; width: 100%; height: 100%;">
+                                    <div class="slide-certificacion">
+                                        <span class="certificacion-texto"></span>
+                                    </div>
+                                </div>
+                                <div class="slide-contenido">
+                                    <div class="slide-header">
+                                        <img class="slide-logo" src="" alt="Logo" style="object-fit: cover; width: 40px; height: 40px;">
+                                        <h3 class="slide-titulo"></h3>
+                                    </div>
+                                    <p class="slide-descripcion"></p>
+                                    <div class="slide-meta">
+                                        <div class="slide-rating">
+                                            <span class="rating-estrellas"></span>
+                                            <span class="rating-numero"></span>
+                                        </div>
+                                        <div class="slide-info">
+                                            <span class="slide-platillos"></span>
+                                            <span class="slide-precio"></span>
+                                        </div>
+                                    </div>
+                                    <div class="slide-actions">
+                                        <a class="slide-boton primary" href="">Ver Restaurantes</a>
+                                        <button class="slide-boton secondary">⭐ Favorito</button>
+                                    </div>
                                 </div>
                             </div>
-                            
-                            <div class="profile-links">
-                                <a href="https://github.com/tu-usuario" target="_blank" class="profile-link">
-                                    <span class="link-icon">🐙</span>
-                                    GitHub
-                                </a>
-                                <a href="https://linkedin.com/in/tu-perfil" target="_blank" class="profile-link">
-                                    <span class="link-icon">💼</span>
-                                    LinkedIn
-                                </a>
-                                <a href="mailto:tu-email@dominio.com" class="profile-link">
-                                    <span class="link-icon">📧</span>
-                                    Email
-                                </a>
-                                <button class="profile-link qr-trigger" onclick="qrSystem.mostrarModalQR()">
-                                    <span class="link-icon">📱</span>
-                                    Escanear QR
-                                </button>
-                            </div>
                         </div>
                     </div>
-                    
-                    <div class="profile-quote">
-                        <blockquote>
-                            <p>"Creando tecnología que hace la alimentación saludable más accesible, transparente y deliciosa para todos."</p>
-                            <cite>— [Tu Nombre], Desarrollador de Salud Juárez</cite>
-                        </blockquote>
-                    </div>
+                </div>
+            </div>
+            
+            <!-- Indicadores -->
+            <div class="carrusel-indicadores" id="carrusel-indicadores">
+                <!-- Se generarán dinámicamente -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Mapa Interactivo -->
+        <section class="mapa-section">
+            <div class="mapa-container">
+                <div class="mapa-header">
+                    <h2 class="section-title">
+                        <span class="title-icon">🗺️</span>
+                        Descubre Restaurantes Cerca de Ti
+                    </h2>
+                    <p class="section-subtitle">Explora el mapa para encontrar opciones saludables en tu zona</p>
+                </div>
+                
+                <div id="mapaSalud" class="mapa-wrapper"></div>
+            </div>
+        </section>
+
+        <!-- Sección Informativa -->
+        <section class="info-section">
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-icon">🥗</div>
+                    <h3 class="info-title">Comida Saludable</h3>
+                    <p class="info-description">
+                        Platillos nutritivos y deliciosos preparados con ingredientes frescos de alta calidad.
+                    </p>
+                    <span class="info-badge">Nutrición Garantizada</span>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">🏆</div>
+                    <h3 class="info-title">Certificación</h3>
+                    <p class="info-description">
+                        Todos nuestros restaurantes pasan por un riguroso proceso de certificación nutricional.
+                    </p>
+                    <span class="info-badge">Calidad Verificada</span>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">📍</div>
+                    <h3 class="info-title">Cerca de Ti</h3>
+                    <p class="info-description">
+                        Encuentra opciones saludables en tu barrio con nuestro sistema de geolocalización.
+                    </p>
+                    <span class="info-badge">Ubicación Conveniente</span>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">❤️</div>
+                    <h3 class="info-title">Favoritos</h3>
+                    <p class="info-description">
+                        Guarda tus restaurantes preferidos y recibe notificaciones de nuevos platillos.
+                    </p>
+                    <span class="info-badge">Personalización</span>
                 </div>
             </div>
         </section>
     </div>
-    
-    <!-- Footer Global -->
-    <footer class="footer-global">
-        <div class="container">
+
+    <!-- Footer para versión HTML - Salud Juárez -->
+    <footer class="footer">
+        <div class="footer-container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4 class="footer-title">Salud Juárez</h4>
-                    <p class="footer-description">Plataforma líder en restaurantes saludables en Ciudad Juárez, promoviendo transparencia nutricional y alimentación consciente.</p>
-                    <div class="footer-social">
-                        <a href="#" class="social-link">📘</a>
-                        <a href="#" class="social-link">📷</a>
-                        <a href="#" class="social-link">🐦</a>
-                    </div>
+                    <h3>🥗 Salud Juárez</h3>
+                    <p>Plataforma de restaurantes saludables en Ciudad Juárez</p>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Inicio</a></li>
+                        <li><a href="signup.php">Registrarse</a></li>
+                        <li><a href="login.php">Iniciar Sesión</a></li>
+                    </ul>
                 </div>
-                
+
                 <div class="footer-section">
-                    <h4 class="footer-title">Mapa del Sitio</h4>
-                    <nav class="footer-nav">
-                        <div class="nav-column">
-                            <h5>Para Clientes</h5>
-                            <ul>
-                                <li><a href="login.php">Iniciar Sesión</a></li>
-                                <li><a href="signup.php">Crear Cuenta</a></li>
-                                <li><a href="DIRECCIONES/buscar_restaurantes.php">Buscar Restaurantes</a></li>
-                                <li><a href="DIRECCIONES/mis_favoritos.php">Mis Favoritos</a></li>
-                            </ul>
-                        </div>
-                        <div class="nav-column">
-                            <h5>Para Restaurantes</h5>
-                            <ul>
-                                <li><a href="signup.php">Registrar Restaurante</a></li>
-                                <li><a href="DIRECCIONES/mis_restaurantes.php">Gestionar Restaurantes</a></li>
-                                <li><a href="DIRECCIONES/inventario.php">Control de Inventario</a></li>
-                                <li><a href="DIRECCIONES/proveedores_cercanos.php">Buscar Proveedores</a></li>
-                            </ul>
-                        </div>
-                        <div class="nav-column">
-                            <h5>Administración</h5>
-                            <ul>
-                                <li><a href="DIRECCIONES/admin_usuarios.php">Gestionar Usuarios</a></li>
-                                <li><a href="DIRECCIONES/validar_negocios.php">Validar Negocios</a></li>
-                                <li><a href="DIRECCIONES/estado_sistema.php">Estado del Sistema</a></li>
-                                <li><a href="PHP/diagnosticar.php">Diagnóstico</a></li>
-                            </ul>
-                        </div>
-                    </nav>
+                    <h3>Funcionalidades</h3>
+                    <ul class="footer-links">
+                        <li><a href="DIRECCIONES/buscar_restaurantes.php">Explorar Restaurantes</a></li>
+                        <li><a href="DIRECCIONES/mis_favoritos.php">Mis Favoritos</a></li>
+                        <li><a href="DIRECCIONES/mapa_proveedores.php">Mapa de Proveedores</a></li>
+                    </ul>
                 </div>
-                
+
                 <div class="footer-section">
-                    <h4 class="footer-title">Créditos</h4>
-                    <div class="credits">
-                        <p><strong>Diseño y Desarrollo:</strong></p>
-                        <p>[Tu Nombre Completo]</p>
-                        <p>Lead Developer & UI/UX Designer</p>
-                        <p>Estudiante de Diseño Digital (DDMI)</p>
-                        <br>
-                        <p><strong>Tecnologías:</strong></p>
-                        <div class="tech-stack">
-                            <span class="tech-tag">🐘 PHP</span>
-                            <span class="tech-tag">🗄️ MySQL</span>
-                            <span class="tech-tag">🎨 CSS3</span>
-                            <span class="tech-tag">⚡ JavaScript</span>
-                            <span class="tech-tag">🗺️ OpenStreetMap</span>
-                        </div>
+                    <h3>Para Restaurantes</h3>
+                    <ul class="footer-links">
+                        <li><a href="DIRECCIONES/gestion_platillos.php">Gestionar Menú</a></li>
+                        <li><a href="DIRECCIONES/inventario.php">Control de Inventario</a></li>
+                        <li><a href="DIRECCIONES/mis_restaurantes.php">Mis Restaurantes</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Tecnologías</h3>
+                    <div class="footer-tech">
+                        <span class="tech-tag">PHP</span>
+                        <span class="tech-tag">MySQL</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">OpenStreetMap</span>
+                        <span class="tech-tag">CSS3</span>
                     </div>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
-                <div class="footer-legal">
-                    <p>&copy; 2026 Salud Juárez. Todos los derechos reservados.</p>
-                    <div class="legal-links">
-                        <a href="#">Política de Privacidad</a>
-                        <a href="#">Términos de Servicio</a>
-                        <a href="#">Política de Cookies</a>
-                    </div>
-                </div>
-                <div class="footer-version">
-                    <p>Versión 2.1.0 | Desarrollado con ❤️ en Ciudad Juárez</p>
-                </div>
+                <p>&copy; 2026 Salud Juárez. Desarrollado por <a href="https://github.com/JLuigi400" target="_blank">Jorge Anibal Espinosa Perales</a></p>
+                <p>🌐 Ciudad Juárez, Chihuahua, México</p>
             </div>
         </div>
     </footer>
-    
-    <!-- Scripts -->
-    <script src="JS/carrusel.js"></script>
-    <script src="JS/qr_portfolio.js"></script>
-    <script src="JS/mapa_salud_juarez.js"></script>
-    
-    <script>
-        // Inicialización del mapa en el index
-        let mapaIndex = null;
-        let capasActivas = {
-            restaurantes: true,
-            proveedores: false,
-            premium: false
-        };
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar mapa después de un pequeño delay para asegurar que todo esté cargado
-            setTimeout(inicializarMapaIndex, 1000);
-            
-            // Lazy loading de imágenes
-            if ('IntersectionObserver' in window) {
-                const imageObserver = new IntersectionObserver((entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const img = entry.target;
-                            img.src = img.dataset.src;
-                            img.classList.remove('lazy-load');
-                            img.classList.add('loaded');
-                            imageObserver.unobserve(img);
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('img.lazy-load').forEach(img => {
-                    imageObserver.observe(img);
-                });
-            }
-        });
-        
-        function inicializarMapaIndex() {
-            try {
-                mapaIndex = new MapaSaludJuarez();
-                
-                // Configurar mapa para el index
-                mapaIndex.inicializar('mapaIndex');
-                
-                // Determinar rol del usuario (si está logueado)
-                const rolUsuario = obtenerRolUsuario();
-                
-                // Cargar datos según rol
-                if (rolUsuario === 2) { // Dueño
-                    // Mostrar restaurantes y proveedores para alianzas
-                    mapaIndex.cargarRestaurantes();
-                    mapaIndex.cargarProveedores();
-                } else {
-                    // Solo mostrar restaurantes para clientes
-                    mapaIndex.cargarRestaurantes();
-                }
-                
-            } catch (error) {
-                console.error('Error inicializando mapa:', error);
-                mostrarErrorMapa();
-            }
-        }
-        
-        function obtenerRolUsuario() {
-            // Verificar si hay sesión activa
-            try {
-                // Esta función debería verificar el rol del usuario
-                // Por ahora, asumimos que no está logueado
-                return null;
-            } catch (error) {
-                return null;
-            }
-        }
-        
-        function toggleCapa(tipo) {
-            if (!mapaIndex) return;
-            
-            capasActivas[tipo] = !capasActivas[tipo];
-            
-            // Actualizar botones
-            document.querySelectorAll('.btn-mapa').forEach(btn => {
-                btn.classList.remove('btn-mapa--active');
-            });
-            event.target.classList.add('btn-mapa--active');
-            
-            // Actualizar mapa
-            switch (tipo) {
-                case 'restaurantes':
-                    if (capasActivas.restaurantes) {
-                        mapaIndex.mostrarRestaurantes();
-                    } else {
-                        mapaIndex.ocultarRestaurantes();
-                    }
-                    break;
-                case 'proveedores':
-                    if (capasActivas.proveedores) {
-                        mapaIndex.mostrarProveedores();
-                    } else {
-                        mapaIndex.ocultarProveedores();
-                    }
-                    break;
-                case 'premium':
-                    if (capasActivas.premium) {
-                        mapaIndex.filtrarRestaurantesPremium();
-                    } else {
-                        mapaIndex.mostrarTodosRestaurantes();
-                    }
-                    break;
-            }
-        }
-        
-        function mostrarErrorMapa() {
-            const mapaContainer = document.getElementById('mapaIndex');
-            if (mapaContainer) {
-                mapaContainer.innerHTML = `
-                    <div class="mapa-error">
-                        <div class="error-icon">🗺️</div>
-                        <h3>No se pudo cargar el mapa</h3>
-                        <p>Por favor, verifica tu conexión a internet</p>
-                        <button onclick="location.reload()" class="btn-reintentar">Reintentar</button>
-                    </div>
-                `;
-            }
-        }
-        
-        // Optimización de rendimiento
-        if ('requestIdleCallback' in window) {
-            requestIdleCallback(() => {
-                // Cargar recursos no críticos cuando el navegador esté inactivo
-                console.log('Salud Juárez - Sistema cargado exitosamente');
-            });
-        }
-    </script>
-    
-    <style>
-        /* Estilos adicionales para nuevas secciones */
-        .section-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .section-title {
-            color: var(--text-primary);
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 0 0 15px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-        
-        .title-icon {
-            font-size: 2rem;
-        }
-        
-        .section-subtitle {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            margin: 0;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .mapa-container {
-            position: relative;
-        }
-        
-        .mapa-controles {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-top: 20px;
-            gap: 20px;
-        }
-        
-        .mapa-legend {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--industrial-light);
-            border-radius: 8px;
-            padding: 15px;
-            min-width: 200px;
-        }
-        
-        .mapa-legend h4 {
-            color: var(--text-primary);
-            margin: 0 0 10px 0;
-            font-size: 0.9rem;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 5px 0;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-        
-        .legend-marker {
-            font-size: 1rem;
-        }
-        
-        .proveedor-item {
-            display: none;
-        }
-        
-        .mapa-filtros {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-mapa {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-secondary);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .btn-mapa:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: var(--text-primary);
-        }
-        
-        .btn-mapa--active {
-            background: var(--accent-primary);
-            color: white;
-            border-color: var(--accent-primary);
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin: 40px 0;
-        }
-        
-        .info-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 30px;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .info-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--accent-primary);
-        }
-        
-        .info-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            display: block;
-        }
-        
-        .info-card h3 {
-            color: var(--text-primary);
-            margin: 0 0 15px 0;
-            font-size: 1.3rem;
-        }
-        
-        .info-card p {
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin: 0 0 20px 0;
-        }
-        
-        .info-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--accent-primary);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .info-cta {
-            text-align: center;
-            margin: 60px 0 0 0;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .info-cta h3 {
-            color: var(--text-primary);
-            margin: 0 0 15px 0;
-            font-size: 1.5rem;
-        }
-        
-        .info-cta p {
-            color: var(--text-secondary);
-            margin: 0 0 30px 0;
-            max-width: 600px;
-            margin: 0 auto 30px;
-            line-height: 1.6;
-        }
-        
-        .cta-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .btn-cta {
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-cta--primary {
-            background: var(--accent-primary);
-            color: white;
-        }
-        
-        .btn-cta--primary:hover {
-            background: #229954;
-            transform: translateY(-2px);
-        }
-        
-        .btn-cta--secondary {
-            background: transparent;
-            color: var(--text-primary);
-            border: 1px solid var(--text-primary);
-        }
-        
-        .btn-cta--secondary:hover {
-            background: var(--text-primary);
-            color: var(--industrial-dark);
-        }
-        
-        .desarrollador-profile {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 40px;
-            align-items: start;
-        }
-        
-        .profile-card {
-            display: flex;
-            gap: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 30px;
-        }
-        
-        .profile-avatar {
-            position: relative;
-            flex-shrink: 0;
-        }
-        
-        .avatar-placeholder {
-            width: 120px;
-            height: 120px;
-            background: var(--accent-primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: white;
-        }
-        
-        .avatar-badge {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background: var(--accent-secondary);
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            border: 2px solid var(--industrial-dark);
-        }
-        
-        .profile-name {
-            color: var(--text-primary);
-            margin: 0 0 5px 0;
-            font-size: 1.5rem;
-        }
-        
-        .profile-role {
-            color: var(--accent-primary);
-            margin: 0 0 10px 0;
-            font-weight: 600;
-        }
-        
-        .profile-education {
-            color: var(--text-secondary);
-            margin: 0 0 20px 0;
-        }
-        
-        .profile-skills h4 {
-            color: var(--text-primary);
-            margin: 0 0 15px 0;
-            font-size: 1rem;
-        }
-        
-        .skills-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .skill-tag {
-            background: rgba(39, 174, 96, 0.2);
-            color: var(--accent-primary);
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            border: 1px solid rgba(39, 174, 96, 0.3);
-        }
-        
-        .profile-links {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .profile-link {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-secondary);
-            padding: 8px 16px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-        
-        .profile-link:hover {
-            background: var(--accent-primary);
-            color: white;
-            border-color: var(--accent-primary);
-        }
-        
-        .profile-quote {
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 4px solid var(--accent-primary);
-            padding: 30px;
-            border-radius: 0 16px 16px 0;
-        }
-        
-        .profile-quote blockquote {
-            margin: 0;
-        }
-        
-        .profile-quote p {
-            color: var(--text-primary);
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin: 0 0 15px 0;
-            font-style: italic;
-        }
-        
-        .profile-quote cite {
-            color: var(--text-secondary);
-            font-style: normal;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-section h4 {
-            color: var(--text-primary);
-            margin: 0 0 20px 0;
-            font-size: 1.1rem;
-        }
-        
-        .footer-description {
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-        
-        .footer-social {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .social-link {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-        
-        .social-link:hover {
-            background: var(--accent-primary);
-            transform: translateY(-2px);
-        }
-        
-        .footer-nav {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 30px;
-        }
-        
-        .nav-column h5 {
-            color: var(--text-primary);
-            margin: 0 0 15px 0;
-            font-size: 0.9rem;
-        }
-        
-        .nav-column ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .nav-column li {
-            margin: 8px 0;
-        }
-        
-        .nav-column a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: color 0.3s ease;
-        }
-        
-        .nav-column a:hover {
-            color: var(--accent-primary);
-        }
-        
-        .credits p {
-            color: var(--text-secondary);
-            margin: 5px 0;
-            font-size: 0.85rem;
-        }
-        
-        .tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        
-        .tech-tag {
-            background: rgba(52, 152, 219, 0.2);
-            color: #3498db;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            border: 1px solid rgba(52, 152, 219, 0.3);
-        }
-        
-        .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 20px;
-            border-top: 1px solid var(--industrial-light);
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .footer-legal {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .footer-legal p {
-            color: var(--text-muted);
-            margin: 0;
-            font-size: 0.8rem;
-        }
-        
-        .legal-links {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .legal-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.8rem;
-            transition: color 0.3s ease;
-        }
-        
-        .legal-links a:hover {
-            color: var(--text-secondary);
-        }
-        
-        .footer-version p {
-            color: var(--text-muted);
-            margin: 0;
-            font-size: 0.8rem;
-        }
-        
-        .mapa-error {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .error-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-        
-        .mapa-error h3 {
-            color: var(--text-primary);
-            margin: 0 0 10px 0;
-        }
-        
-        .mapa-error p {
-            color: var(--text-secondary);
-            margin: 0 0 20px 0;
-        }
-        
-        .btn-reintentar {
-            background: var(--accent-primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-reintentar:hover {
-            background: #229954;
-            transform: translateY(-2px);
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .section-title {
-                font-size: 2rem;
-            }
-            
-            .mapa-controles {
-                flex-direction: column;
-            }
-            
-            .desarrollador-profile {
-                grid-template-columns: 1fr;
-            }
-            
-            .profile-card {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .footer-bottom {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .footer-legal {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-    </style>
+
+    <!-- Scripts Unificados -->
+    <script src="JS/carrusel_unificado.js"></script>
+    <script src="JS/index_scripts.js"></script>
+    <script src="JS/modal_html.js"></script>
 </body>
 </html>

@@ -27,7 +27,9 @@ $is_logged = isset($_SESSION['id_usu']);
 
                 <?php if ($id_rol == 1): // Administrador ?>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/admin_usuarios.php">Usuarios</a></li>
+                    <!--
                     <li><a href="<?php echo $path; ?>DIRECCIONES/validar_negocios.php">Validar</a></li>
+                    -->
                     <li><a href="<?php echo $path; ?>DIRECCIONES/admin_ingredientes.php">Ingredientes</a></li>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/mapa_proveedores.php">Mapa</a></li>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/estado_sistema.php">Estado</a></li>
@@ -44,12 +46,22 @@ $is_logged = isset($_SESSION['id_usu']);
                 
                 <li class="user-menu">
                     <span class="user-nick">👤 <?php echo $nombre_usuario; ?></span>
+                    <button id="btnOpenDevModal" class="btn-developer">
+                        <span class="btn-icon">👨‍💻</span>
+                        <span class="btn-text">Acerca del Desarrollador</span>
+                    </button>
                     <a href="<?php echo $path; ?>PHP/logout.php" class="btn-salir">Cerrar Sesión</a>
                 </li>
 
             <?php else: ?>
                 <li><a href="<?php echo $path; ?>login.php">Iniciar Sesión</a></li>
                 <li><a href="<?php echo $path; ?>signup.php" class="btn-nav-signup">Crear Cuenta</a></li>
+                <li>
+                    <button id="btnOpenDevModal" class="btn-developer">
+                        <span class="btn-icon">👨‍💻</span>
+                        <span class="btn-text">Acerca del Desarrollador</span>
+                    </button>
+                </li>
             <?php endif; ?>
         </ul>
     </div>

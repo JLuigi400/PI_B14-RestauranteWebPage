@@ -1,0 +1,43 @@
+/**
+ * Estilos para Iconos Sociales del Modal - Salud Juárez
+ * Soporte para imágenes PNG en lugar de emojis
+ * Versión: 1.0.0
+ * Fecha: 26 de Marzo de 2026
+ */
+
+/* Iconos sociales con imágenes */
+.social-icon-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.social-link:hover .social-icon-img {
+    transform: scale(1.1);
+}
+
+/* Ajustes específicos por red social */
+.social-link.github .social-icon-img {
+    filter: brightness(0) invert(1);
+}
+
+.social-link.instagram .social-icon-img {
+    border-radius: 4px;
+}
+
+.social-link.behance .social-icon-img {
+    border-radius: 2px;
+}
+
+.social-link.email .social-icon-img {
+    border-radius: 50%;
+}
+
+/* Responsive para iconos */
+@media (max-width: 768px) {
+    .social-icon-img {
+        width: 20px;
+        height: 20px;
+    }
+}

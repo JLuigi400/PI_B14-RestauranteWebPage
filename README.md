@@ -1,199 +1,211 @@
-# 🥗 Sistema de Gestión para Restaurantes - Ciudad Juárez
+# 🍽️ Salud Juárez - Sistema de Restaurantes
 
-Plataforma web integral para la consulta y administración de espacios gastronómicos en Ciudad Juárez, facilitando la interacción entre usuarios finales y dueños/chefs.
+## 📋 **Resumen General del Proyecto**
 
-## 👥 Roles del Sistema
+Sistema web completo para gestión de restaurantes con enfoque en salud, transparencia de ingredientes y control nutricional.
 
-- **Usuario**: Puede buscar, filtrar y ver detalles de restaurantes.
-- **Administrador**: Puede crear, editar y eliminar restaurantes/comidas.
-- **Dueño**: Puede registrar restaurante, gestionar menú e inventario.
+### **🎯 Objetivo Principal**
+Crear una plataforma donde los restaurantes puedan mostrar sus platillos con información nutricional detallada, permitiendo a los clientes tomar decisiones informadas sobre su alimentación.
 
-## 🚀 Requisitos Previos
-
-- **PHP** >= 7.4.0
-- **MySQL** (XAMPP recomendado)
-- **Apache** Server
-- **Composer** (opcional, para autoloading)
-
-## 📦 Instalación
-
-1. **Clonar el repositorio**:
-   ```bash
-   git clone https://github.com/JLuigi400/PI_B14-RestauranteWebPage.git
-   cd PI_B14-RestauranteWebPage
-   ```
-
-2. **Configurar entorno**:
-   ```bash
-   cp .env.example .env
-   # Editar .env con tus credenciales de base de datos
-   ```
-
-3. **Configurar base de datos**:
-   - Iniciar XAMPP (Apache + MySQL en puerto 3307)
-   - Crear base de datos `restaurantes`
-   - Importar los archivos SQL desde la carpeta `SQL/`
-
-4. **Configurar archivos sensibles**:
-   ```bash
-   # Copiar configuración base
-   cp config.php.example config.php
-   # Ajustar credenciales en config.php
-   ```
-
-5. **Permisos de carpetas**:
-   ```bash
-   chmod 755 UPLOADS/
-   chmod 755 IMG/
-   ```
-
-## 🌐 Acceso a la Aplicación
-
-- **URL principal**: `http://localhost/restaurantes/`
-- **Panel de administración**: `http://localhost/restaurantes/DIRECCIONES/dashboard.php`
-
-## 📁 Estructura del Proyecto
-
-```
-restaurantes/
-├── CSS/                    # Hojas de estilo
-├── DIRECCIONES/           # Panel de administración y gestión
-├── IMG/                   # Imágenes del sistema
-├── JS/                    # Archivos JavaScript
-├── PHP/                   # Lógica del backend
-├── UPLOADS/               # Archivos subidos por usuarios
-├── SQL/                   # Scripts de base de datos (local)
-├── .htaccess              # Configuración de Apache
-├── config.php             # Configuración centralizada
-├── composer.json          # Dependencias PHP
-├── index.html             # Página principal
-├── login.php              # Inicio de sesión
-└── signup.php             # Registro de usuarios
-```
-
-## 🗄️ Base de Datos
-
-### Tablas Principales
-- `usuarios`: Credenciales y roles
-- `perfiles`: Datos personales
-- `restaurante`: Información de negocios
-- `platillos`: Menú de restaurantes
-- `inventario`: Ingredientes y stock
-- `categorias`: Tipos de comida
-
-### Roles del Sistema
-- **1**: Administrador
-- **2**: Dueño de restaurante
-- **3**: Comensal/Usuario
-
-## 🔧 Configuración
-
-### Variables de Entorno (.env)
-```env
-DB_HOST=localhost
-DB_PORT=3307
-DB_NAME=restaurantes
-DB_USER=root
-DB_PASS=
-DEBUG_MODE=true
-```
-
-### Configuración de Apache (.htaccess)
-- URLs amigables
-- Cabeceras de seguridad
-- Compresión gzip
-- Caché de archivos estáticos
-
-## 🎨 Características
-
-### Para Usuarios
-- Búsqueda avanzada de restaurantes
-- Filtros por sector y tipo de comida
-- Visualización de menús y precios
-- Sistema de calificaciones
-
-### Para Dueños
-- Gestión completa del restaurante
-- Administración de menú
-- Control de inventario
-- Análisis comparativo
-
-### Para Administradores
-- Gestión de usuarios
-- Moderación de contenido
-- Estadísticas del sistema
-
-## 🛡️ Seguridad
-
-- Tokens CSRF en formularios
-- Hashing de contraseñas (PASSWORD_DEFAULT)
-- Validación de entrada de datos
-- Cabeceras de seguridad HTTP
-- Prevención de inyección SQL con PDO
-
-## 🧪 Testing
-
-```bash
-# Ejecutar tests (si se instala PHPUnit)
-composer test
-```
-
-## 📝 Desarrollo
-
-### Flujo de Trabajo
-1. Crear rama feature: `git checkout -b feature/nueva-funcionalidad`
-2. Hacer cambios y commitear: `git commit -m "Agregar nueva funcionalidad"`
-3. Push al repositorio: `git push origin feature/nueva-funcionalidad`
-4. Crear Pull Request
-
-### Convenciones
-- PHP siguiendo PSR-12
-- Nombres de variables en español
-- Comentarios descriptivos
-- Código limpio y mantenible
-
-## 🐛 Problemas Comunes
-
-### Error de Conexión a BD
-- Verificar que MySQL esté corriendo en puerto 3307
-- Confirmar credenciales en `.env`
-- Revisar que la base de datos `restaurantes` exista
-
-### Problemas de Permisos
-- Asegurar que Apache tenga permisos en `UPLOADS/` y `IMG/`
-- Verificar configuración en `.htaccess`
-
-### Imágenes no se muestran
-- Revisar permisos de carpeta `IMG/`
-- Verificar que `UPLOADS/` tenga permisos de escritura
-
-## 📄 Licencia
-
-Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
-
-## 🤝 Contribuciones
-
-¡Las contribuciones son bienvenidas! Por favor:
-
-1. Fork el proyecto
-2. Crear una rama feature
-3. Hacer tus cambios
-4. Commitear tus cambios
-5. Push a la rama
-6. Crear un Pull Request
-
-## 📞 Contacto
-
-- **Autor**: JLuigi400
-- **Email**: contacto@restaurantesjuarez.com
-- **Issues**: [GitHub Issues](https://github.com/JLuigi400/PI_B14-RestauranteWebPage/issues)
-
-## 🙏 Agradecimientos
-
-- Al equipo de desarrollo por su dedicación
-- A la comunidad de Ciudad Juárez por su apoyo
-- A todos los restaurantes participantes
+### **🚀 Estado Actual: Versión 2.1.0 - COMPLETO**
+- ✅ **100% funcional** con geolocalización completa
+- ✅ **Todos los roles** implementados y operativos
+- ✅ **Mapas interactivos** con OpenStreetMap
+- ✅ **Sistema de favoritos** y recomendaciones
+- ✅ **Panel administrativo** completo
+- ✅ **Validación de restaurantes** automatizada
+- ✅ **Documentación completa** y actualizada
 
 ---
 
-**Nota**: Este es un proyecto educativo y de demostración para la gestión de restaurantes en Ciudad Juárez.
+## 🏗️ **Arquitectura del Sistema**
+
+### **Roles de Usuario**
+- **🛡️ Administrador (Rol 1):** Supervisión completa del sistema
+- **👑 Dueño de Restaurante (Rol 2):** Gestión de su negocio
+- **👤 Cliente/Comensal (Rol 3):** Exploración y consumo
+
+### **Módulos Principales**
+1. **🏪 Gestión de Restaurantes:** Validación y supervisión
+2. **📦 Inventario:** Control de ingredientes con alergenos y valores nutricionales
+3. **🍽️ Platillos:** Creación con ingredientes específicos y cantidades
+4. **👁️ Visualización:** Menús adaptados por roles con información nutricional
+5. **🔍 Administración:** Panel central de supervisión
+
+---
+
+## 🚀 **Funcionalidades Implementadas**
+
+### **✅ Módulo de Inventario**
+- Gestión completa de ingredientes
+- Registro de alergenos y ingredientes secretos
+- Control de stock con alertas automáticas
+- Valores nutricionales base por ingrediente
+- Sistema de imágenes para ingredientes
+
+### **✅ Módulo de Platillos**
+- Creación de platillos con selección dinámica de ingredientes
+- Especificación de cantidades y unidades
+- Control de visibilidad de ingredientes
+- Cálculo automático de calorías totales
+- Gestión de categorías
+
+### **✅ Módulo de Visualización**
+- Menús adaptados por roles
+- Información nutricional para clientes
+- Alertas de alergenos
+- Filtros de búsqueda
+- Interfaz responsive
+
+### **✅ Módulo de Administración**
+- Panel central de supervisión
+- Filtros avanzados por restaurante y criterios
+- Estadísticas en tiempo real
+- Edición de valores nutricionales
+- Control de stock crítico
+
+---
+
+## 🔧 **Tecnologías Utilizadas**
+
+### **Backend**
+- **PHP 7.4+** con programación orientada a objetos
+- **MySQL 8.0** con consultas optimizadas
+- **Sesiones seguras** con manejo de roles
+- **Prepared Statements** contra SQL injection
+
+### **Frontend**
+- **HTML5** semántico y accesible
+- **CSS3** con diseño responsive
+- **JavaScript vanilla** con AJAX
+- **Bootstrap-like** componentes personalizados
+
+### **Base de Datos**
+- **Diseño relacional** normalizado
+- **Índices optimizados** para rendimiento
+- **Triggers** para notificaciones automáticas
+- **Vistas** para consultas complejas
+
+---
+
+## 📊 **Características Destacadas**
+
+### **🔒 Seguridad por Roles**
+- Cada rol ve solo la información pertinente
+- Ingredientes secretos protegidos
+- Validación de permisos en cada operación
+- Control de acceso a recursos
+
+### **🥗 Salud y Nutrición**
+- Información nutricional detallada
+- Alertas de alergenos
+- Cálculo automático de calorías
+- Filtros para dietas específicas
+
+### **📱 Experiencia de Usuario**
+- Interface intuitiva y moderna
+- Operaciones AJAX sin recargas
+- Indicadores visuales claros
+- Diseño responsive
+
+---
+
+## 🔄 **Flujo de Trabajo**
+
+### **Para Dueños**
+1. **Registro** y validación del restaurante
+2. **Configuración** de inventario con ingredientes
+3. **Creación** de platillos con ingredientes específicos
+4. **Gestión** de stock y precios
+5. **Supervisión** de menú y nutrición
+
+### **Para Clientes**
+1. **Búsqueda** de restaurantes
+2. **Exploración** de menús con filtros
+3. **Visualización** de información nutricional
+4. **Toma de decisiones** informadas
+5. **Gestión** de favoritos
+
+### **Para Administradores**
+1. **Validación** de nuevos restaurantes
+2. **Supervisión** general del sistema
+3. **Análisis** de tendencias
+4. **Gestión** de usuarios
+5. **Control** de calidad
+
+---
+
+## 📈 **Métricas y Estadísticas**
+
+### **Indicadores Clave**
+- Total de restaurantes activos
+- Número de platillos por restaurante
+- Ingredientes con stock crítico
+- Platillos más populares
+- Tendencias nutricionales
+
+### **Reportes Automáticos**
+- Alertas de stock bajo
+- Notificaciones de alergenos
+- Estadísticas de uso
+- Reportes de actividad
+
+---
+
+## 🛡️ **Seguridad Implementada**
+
+### **Protección de Datos**
+- Encriptación de contraseñas
+- Validación de entradas
+- Escape de salidas
+- Prevención de XSS
+
+### **Control de Acceso**
+- Sesiones seguras
+- Verificación de roles
+- Tokens CSRF
+- Límite de intentos
+
+---
+
+## 🚧 **Estado Actual**
+
+### **✅ Completado**
+- Sistema de autenticación completo
+- Gestión de restaurantes y usuarios
+- Inventario con control de alergenos
+- Sistema de platillos con ingredientes
+- Visualización adaptada por roles
+- Panel administrativo central
+
+### **🔄 En Desarrollo**
+- Sistema de pedidos online
+- Integración con pasarelas de pago
+- App móvil para clientes
+- Sistema de calificaciones
+- Analytics avanzado
+
+---
+
+## 📚 **Documentación**
+
+- **`README_DIRECCIONES.md`** - Páginas y rutas del sistema
+- **`README_LOGISTICA.md`** - Arquitectura y flujo de datos
+- **`README_TEMATICA.md`** - Enfoque en salud y nutrición
+- **`ARIS_REQUEST/`** - Solicitudes específicas para desarrollo
+
+---
+
+## 🎯 **Próximos Pasos**
+
+1. **Implementar sistema de pedidos**
+2. **Agregar integración de pagos**
+3. **Desarrollar app móvil**
+4. **Sistema de reseñas y calificaciones**
+5. **Analytics y reportes avanzados**
+
+---
+
+**Última actualización:** 2026-03-21  
+**Versión:** 2.0.0  
+**Estado:** Producción estable con mejoras continuas

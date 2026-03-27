@@ -1,0 +1,338 @@
+/**
+ * Animaciones para Modal del Desarrollador - Salud Juárez
+ * Animaciones de entrada, salida y efectos visuales
+ * Versión: 1.0.0
+ * Fecha: 26 de Marzo de 2026
+ */
+
+/* Animaciones de entrada/salida del modal */
+.dev-modal-overlay {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter: blur(0px);
+}
+
+.dev-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    backdrop-filter: blur(5px);
+}
+
+.dev-modal-overlay.show .dev-modal-container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.dev-modal-container {
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Animación de slide para notificaciones */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Animación de pulso para el avatar */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.dev-avatar:hover img {
+    animation: pulse 2s infinite;
+}
+
+/* Animación de brillo para iconos sociales */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.social-link:hover .social-icon-img {
+    animation: shimmer 2s infinite;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    background-size: 200% 100%;
+}
+
+/* Animación de fade-in para secciones */
+.dev-modal-content > div {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.dev-modal-content > div:nth-child(1) { animation-delay: 0.1s; }
+.dev-modal-content > div:nth-child(2) { animation-delay: 0.2s; }
+.dev-modal-content > div:nth-child(3) { animation-delay: 0.3s; }
+.dev-modal-content > div:nth-child(4) { animation-delay: 0.4s; }
+.dev-modal-content > div:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animación de hover para skill cards */
+.skill-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skill-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.skill-icon {
+    transition: transform 0.3s ease;
+}
+
+.skill-card:hover .skill-icon {
+    transform: rotate(360deg) scale(1.1);
+}
+
+/* Animación para tech tags */
+.tech-tag {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tech-tag::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.tech-tag:hover::before {
+    left: 100%;
+}
+
+.tech-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Animación para QR */
+.qr-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.qr-container::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #3498db, #2ecc71, #3498db);
+    border-radius: 12px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    animation: rotate 3s linear infinite;
+}
+
+.qr-container:hover::before {
+    opacity: 1;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Animación de carga para QR */
+.qr-image {
+    transition: opacity 0.3s ease;
+}
+
+.qr-image.loading {
+    opacity: 0.5;
+}
+
+/* Animación para botones */
+.btn-footer {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-footer::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn-footer:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-footer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* Animación para project cards */
+.project-card {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(52,152,219,0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.project-card:hover::before {
+    left: 100%;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+/* Animación para stats */
+.stat-item {
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, rgba(52,152,219,0.1), rgba(46,204,113,0.1));
+    border-radius: 12px;
+}
+
+.stat-number {
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover .stat-number {
+    transform: scale(1.1);
+}
+
+/* Animación de notificación temporal */
+.modal-notification {
+    animation: slideIn 0.3s ease, pulse 0.5s ease 2s;
+}
+
+/* Responsive animations */
+@media (max-width: 768px) {
+    .dev-modal-container {
+        transform: scale(0.95) translateY(30px);
+    }
+    
+    .skill-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .tech-tag:hover {
+        transform: translateY(-1px);
+    }
+}
+
+/* Animación de carga inicial */
+@keyframes modalLoad {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(50px);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(0.9) translateY(25px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.dev-modal-overlay.active .dev-modal-container {
+    animation: modalLoad 0.4s ease-out;
+}
+
+/* Efecto de typing para el nombre del desarrollador */
+.dev-name {
+    overflow: hidden;
+    border-right: 2px solid #3498db;
+    white-space: nowrap;
+    animation: typing 2s steps(30, end), blink 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink {
+    from, to { border-color: transparent; }
+    50% { border-color: #3498db; }
+}
+
+/* Desactivar animación en modo reducido */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

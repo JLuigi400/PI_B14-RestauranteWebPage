@@ -1,0 +1,280 @@
+/**
+ * Estilos del Botón del Desarrollador - Salud Juárez
+ * Botón consistente para todas las páginas y roles
+ * Versión: 1.0.0
+ * Fecha: 27 de Marzo de 2026
+ */
+
+/* Botón del Desarrollador - Estilo Principal */
+.btn-developer {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Icono del botón */
+.btn-developer .btn-icon {
+    font-size: 16px;
+    transition: transform 0.3s ease;
+}
+
+/* Texto del botón */
+.btn-developer .btn-text {
+    position: relative;
+    z-index: 1;
+}
+
+/* Efecto de onda al hacer clic */
+.btn-developer::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn-developer:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Hover effects */
+.btn-developer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.btn-developer:hover .btn-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Active state */
+.btn-developer:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+/* Efecto de brillo */
+.btn-developer::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 70%
+    );
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+    opacity: 0;
+}
+
+.btn-developer:hover::after {
+    animation: shimmer 1.5s ease-in-out;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 0;
+    }
+}
+
+/* Variación para navbar principal */
+.main-navbar .btn-developer {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+}
+
+.main-navbar .btn-developer:hover {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+}
+
+/* Variación para user menu */
+.user-menu .btn-developer {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    font-size: 13px;
+    padding: 10px 16px;
+}
+
+.user-menu .btn-developer:hover {
+    background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+/* Versión minimalista para espacios reducidos */
+.btn-developer.minimal {
+    background: transparent;
+    color: #666;
+    border: 2px solid #666;
+    box-shadow: none;
+}
+
+.btn-developer.minimal:hover {
+    background: #666;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Versión outline */
+.btn-developer.outline {
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+    box-shadow: none;
+}
+
+.btn-developer.outline:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .btn-developer {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    .btn-developer .btn-text {
+        display: none;
+    }
+    
+    .btn-developer .btn-icon {
+        font-size: 18px;
+    }
+    
+    /* En móvil, mostrar solo el icono */
+    .user-menu .btn-developer {
+        padding: 8px 12px;
+    }
+    
+    .user-menu .btn-developer .btn-text {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-developer {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .btn-developer .btn-icon {
+        font-size: 16px;
+    }
+}
+
+/* Accesibilidad */
+.btn-developer:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.btn-developer:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Animación de carga */
+.btn-developer.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn-developer.loading .btn-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Estado de éxito */
+.btn-developer.success {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    animation: pulse 0.5s ease;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Compatibilidad con diferentes temas */
+.theme-dark .btn-developer {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.theme-dark .btn-developer:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+}
+
+/* Animación de entrada */
+.btn-developer {
+    animation: btnEntrance 0.6s ease-out;
+}
+
+@keyframes btnEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Efecto de typing para el texto */
+.btn-developer.typing .btn-text {
+    overflow: hidden;
+    border-right: 2px solid currentColor;
+    white-space: nowrap;
+    animation: typing 2s steps(20, end), blink 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink {
+    from, to { border-color: transparent; }
+    50% { border-color: currentColor; }
+}

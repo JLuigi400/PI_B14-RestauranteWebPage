@@ -124,7 +124,7 @@ $path = $is_in_direcciones ? "../" : "";
                         <img src="<?php echo $path; ?>IMG/LOGOTIPOS/ICON/behance.png" alt="Behance" class="social-icon">
                         <div class="social-info">
                             <span class="social-name">Behance</span>
-                            <span class="social-handle">jorgeaespinos1</span>
+                            <span class="social-handle">Jorge Anibal Espinosa Perales</span>
                         </div>
                     </a>
                     <a href="mailto:anibal.espinosa.perales@gmail.com" class="social-link email">

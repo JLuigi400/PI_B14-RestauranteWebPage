@@ -145,28 +145,28 @@ class ModalDesarrolladorHTML {
                             </h4>
                             <div class="social-links">
                                 <a href="https://github.com/JLuigi400" target="_blank" class="social-link github">
-                                    <img src="IMG/LOGOTIPOS/ICON/github.png" alt="GitHub" class="social-icon-img">
+                                    <img src="IMG/LOGOTIPOS/ICON/github.png" alt="GitHub" class="social-icon">
                                     <div class="social-info">
                                         <span class="social-name">GitHub</span>
                                         <span class="social-handle">@JLuigi400</span>
                                     </div>
                                 </a>
                                 <a href="https://www.instagram.com/jorgeluigi400/" target="_blank" class="social-link instagram">
-                                    <img src="IMG/LOGOTIPOS/ICON/instagram.png" alt="Instagram" class="social-icon-img">
+                                    <img src="IMG/LOGOTIPOS/ICON/instagram.png" alt="Instagram" class="social-icon">
                                     <div class="social-info">
                                         <span class="social-name">Instagram</span>
                                         <span class="social-handle">@jorgeluigi400</span>
                                     </div>
                                 </a>
                                 <a href="https://www.behance.net/jorgeaespinos1" target="_blank" class="social-link behance">
-                                    <img src="IMG/LOGOTIPOS/ICON/behance.png" alt="Behance" class="social-icon-img">
+                                    <img src="IMG/LOGOTIPOS/ICON/behance.png" alt="Behance" class="social-icon">
                                     <div class="social-info">
                                         <span class="social-name">Behance</span>
-                                        <span class="social-handle">jorgeaespinos1</span>
+                                        <span class="social-handle">Jorge Anibal Espinosa Perales</span>
                                     </div>
                                 </a>
                                 <a href="mailto:anibal.espinosa.perales@gmail.com" class="social-link email">
-                                    <span class="social-icon">📧</span>
+                                    <img src="IMG/LOGOTIPOS/ICON/google.png" alt="Email" class="social-icon">
                                     <div class="social-info">
                                         <span class="social-name">Email</span>
                                         <span class="social-handle">anibal.espinosa.perales@gmail.com</span>

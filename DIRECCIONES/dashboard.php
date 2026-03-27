@@ -20,6 +20,8 @@ $rol_nombre = $_SESSION['rol_nombre'];
     <?php include '../PHP/header_meta.php'; ?>
     <link rel="stylesheet" href="../CSS/stylesheet.css">
     <link rel="stylesheet" href="../CSS/navegador.css">
+    <link rel="stylesheet" href="../CSS/modal_theme.css">
+    <link rel="stylesheet" href="../CSS/modal_social_icons.css">
     <script src="../JS/session_check.js"></script>
 </head>
 <body>
@@ -86,6 +88,7 @@ $rol_nombre = $_SESSION['rol_nombre'];
     <!-- Scripts del Modal -->
     <script src="../JS/modal_desarrollador.js"></script>
     <script src="../JS/main_interactions.js"></script>
+    <script src="../JS/modal_html.js"></script>
     
     <!-- Script para corregir modal duplicado -->
     <script>

@@ -46,11 +46,10 @@ $is_logged = isset($_SESSION['id_usu']);
                 
                 <li class="user-menu">
                     <span class="user-nick">👤 <?php echo $nombre_usuario; ?></span>
+                    <a href="<?php echo $path; ?>PHP/logout.php" class="btn-salir">Cerrar Sesión</a>
                     <button id="btnOpenDevModal" class="btn-developer">
                         <span class="btn-icon">👨‍💻</span>
-                        <span class="btn-text">Acerca del Desarrollador</span>
                     </button>
-                    <a href="<?php echo $path; ?>PHP/logout.php" class="btn-salir">Cerrar Sesión</a>
                 </li>
 
             <?php else: ?>

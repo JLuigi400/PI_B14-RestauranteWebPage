@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="CSS/stylesheet.css">
     <link rel="stylesheet" href="CSS/navegador.css">
     <link rel="stylesheet" href="CSS/inicio.css">
+    <link rel="stylesheet" href="CSS/modal_theme.css">
+    <link rel="stylesheet" href="CSS/modal_social_icons.css">
 </head>
 <body>
     <?php include 'PHP/navbar.php'; ?>
@@ -29,5 +31,6 @@
     </main>
     <script src="JS/auth.js"></script>
     <script src="JS/session_check.js"></script>
+    <script src="JS/modal_html.js"></script>
 </body>
 </html>

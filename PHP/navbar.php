@@ -34,6 +34,7 @@ $is_logged = isset($_SESSION['id_usu']);
                     <li><a href="<?php echo $path; ?>DIRECCIONES/mapa_proveedores.php">Mapa</a></li>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/estado_sistema.php">Estado</a></li>
                     <li><a href="<?php echo $path; ?>PHP/diagnosticar.php">🔍 Diagnóstico</a></li>
+                    
                 <?php elseif ($id_rol == 2): // Dueño de Restaurante ?>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/gestion_platillos.php">Mi Menú</a></li>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/inventario.php">Inventario</a></li>
@@ -47,9 +48,6 @@ $is_logged = isset($_SESSION['id_usu']);
                 <li class="user-menu">
                     <span class="user-nick">👤 <?php echo $nombre_usuario; ?></span>
                     <a href="<?php echo $path; ?>PHP/logout.php" class="btn-salir">Cerrar Sesión</a>
-                    <button id="btnOpenDevModal" class="btn-developer">
-                        <span class="btn-icon">👨‍💻</span>
-                    </button>
                 </li>
 
             <?php else: ?>

@@ -53,12 +53,7 @@ $is_logged = isset($_SESSION['id_usu']);
             <?php else: ?>
                 <li><a href="<?php echo $path; ?>login.php">Iniciar Sesión</a></li>
                 <li><a href="<?php echo $path; ?>signup.php" class="btn-nav-signup">Crear Cuenta</a></li>
-                <li>
-                    <button id="btnOpenDevModal" class="btn-developer">
-                        <span class="btn-icon">👨‍💻</span>
-                        <span class="btn-text">Acerca del Desarrollador</span>
-                    </button>
-                </li>
+                <!-- Botón desarrollador solo en index.html -->
             <?php endif; ?>
         </ul>
     </div>

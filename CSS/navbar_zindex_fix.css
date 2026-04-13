@@ -1,0 +1,88 @@
+/**
+ * Corrección de z-index para Navbar y Mapa
+ * Salud Juárez - Sistema de Restaurantes
+ * Versión: 1.0.0
+ */
+
+/* Navbar con z-index alto para estar encima del mapa */
+.main-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999 !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Contenedor principal con espacio para navbar */
+body {
+    padding-top: 70px; /* Espacio para navbar fijo */
+}
+
+/* Dashboard específico */
+.usuario-dashboard {
+    padding-top: 80px; /* Más espacio para navbar en dashboard */
+}
+
+/* Mapa con z-index bajo */
+#mapa-restaurantes,
+.leaflet-container,
+.leaflet-map-pane {
+    z-index: 1 !important;
+}
+
+/* Controles del mapa encima del mapa pero debajo del navbar */
+.leaflet-control-container,
+.leaflet-top,
+.leaflet-bottom {
+    z-index: 1000 !important;
+}
+
+/* Popup del mapa */
+.leaflet-popup-pane {
+    z-index: 1001 !important;
+}
+
+/* Marcadores del mapa */
+.leaflet-marker-pane,
+.leaflet-shadow-pane {
+    z-index: 1002 !important;
+}
+
+/* Capa de tiles del mapa */
+.leaflet-tile-pane {
+    z-index: 1 !important;
+}
+
+/* Overlay del mapa */
+.leaflet-overlay-pane {
+    z-index: 100 !important;
+}
+
+/* Para dashboard específico */
+.dashboard-section {
+    position: relative;
+    z-index: 2;
+}
+
+/* Footer debajo del mapa */
+.footer {
+    position: relative;
+    z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-navbar {
+        z-index: 9999 !important;
+    }
+    
+    .usuario-dashboard {
+        padding-top: 90px; /* Más espacio en móvil */
+    }
+    
+    body {
+        padding-top: 80px;
+    }
+}

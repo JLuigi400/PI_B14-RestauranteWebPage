@@ -68,21 +68,34 @@ $rol_nombre = $_SESSION['rol_nombre'];
                 </div>
 
             <?php else: // VISTA COMENSAL (USUARIO 3) ?>
-                <div class="sj-dashboard-cards">
-                    <div class="sj-dash-card">
-                        <h3>🔍 Explorar Salud Juárez</h3>
-                        <p>Busca restaurantes saludables y descubre sus platillos disponibles.</p>
-                        <div class="sj-dash-actions">
-                            <a href="buscar_restaurantes.php" class="sj-action">🗺️ Explorar</a>
-                            <a href="mis_favoritos.php" class="sj-action">⭐ Favoritos</a>
+                <!-- Redirigir al dashboard especializado para usuarios -->
+                <script>
+                    window.location.href = 'dashboard_usuario.php';
+                </script>
+                <noscript>
+                    <div class="sj-dashboard-cards">
+                        <div class="sj-dash-card">
+                            <h3>🔍 Explorar Salud Juárez</h3>
+                            <p>Busca restaurantes saludables y descubre sus platillos disponibles.</p>
+                            <div class="sj-dash-actions">
+                                <a href="dashboard_usuario.php" class="sj-action">🗺️ Mi Espacio</a>
+                                <a href="buscar_restaurantes.php" class="sj-action">� Explorar</a>
+                                <a href="mis_favoritos.php" class="sj-action">⭐ Favoritos</a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </noscript>
             <?php endif; ?>
         </section>
         
-        <!-- Footer Global -->
-        <?php include '../PHP/footer.php'; ?>
+        
+
+                <div class="footer-bottom">
+                    <p>&copy; 2026 Salud Juárez. Desarrollado por <a href="https://github.com/JLuigi400" target="_blank">Jorge Anibal Espinosa Perales</a></p>
+                    <p>🌐 Ciudad Juárez, Chihuahua, México</p>
+                </div>
+            </div>
+        </footer>
     </main>
 
     <!-- Scripts del Modal -->
@@ -90,32 +103,38 @@ $rol_nombre = $_SESSION['rol_nombre'];
     <script src="../JS/main_interactions.js"></script>
     <script src="../JS/modal_html.js"></script>
     
-    <!-- Script para corregir modal duplicado -->
+    <!-- Script para corregir modal duplicado (solo para roles que lo necesitan) -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Eliminar modales duplicados si existen
-        const modals = document.querySelectorAll('.dev-modal-overlay');
-        if (modals.length > 1) {
-            // Mantener solo el primer modal
-            for (let i = 1; i < modals.length; i++) {
-                modals[i].remove();
-            }
-            console.log('🔧 Modal duplicado eliminado');
-        }
+        // Solo ejecutar limpieza si hay modal de desarrollador
+        const modalDev = document.getElementById('devModal');
+        const openBtn = document.getElementById('btnOpenDevModal');
         
-        // Asegurar que solo exista un botón de abrir modal
-        const buttons = document.querySelectorAll('#btnOpenDevModal');
-        if (buttons.length > 1) {
-            // Mantener solo el primer botón
-            for (let i = 1; i < buttons.length; i++) {
-                buttons[i].remove();
+        if (modalDev && openBtn) {
+            // Eliminar modales duplicados si existen
+            const modals = document.querySelectorAll('.dev-modal-overlay');
+            if (modals.length > 1) {
+                // Mantener solo el primer modal
+                for (let i = 1; i < modals.length; i++) {
+                    modals[i].remove();
+                }
+                console.log('🔧 Modal duplicado eliminado');
             }
-            console.log('🔧 Botón duplicado eliminado');
-        }
-        
-        // Reinicializar el modal si es necesario
-        if (typeof window.initModal === 'function') {
-            window.initModal();
+            
+            // Asegurar que solo exista un botón de abrir modal
+            const buttons = document.querySelectorAll('#btnOpenDevModal');
+            if (buttons.length > 1) {
+                // Mantener solo el primer botón
+                for (let i = 1; i < buttons.length; i++) {
+                    buttons[i].remove();
+                }
+                console.log('🔧 Botón duplicado eliminado');
+            }
+            
+            // Reinicializar el modal si es necesario
+            if (typeof window.initModal === 'function') {
+                window.initModal();
+            }
         }
     });
     </script>

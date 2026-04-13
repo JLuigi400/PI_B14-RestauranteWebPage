@@ -10,6 +10,13 @@
 $current_path = $_SERVER['PHP_SELF'] ?? '';
 $is_in_direcciones = strpos($current_path, '/DIRECCIONES/') !== false;
 $path = $is_in_direcciones ? "../" : "";
+
+// Detectar si es una página de dashboard o usuario logueado
+$es_dashboard_usuario = strpos($current_path, 'dashboard_usuario.php') !== false;
+$es_dashboard = strpos($current_path, 'dashboard.php') !== false;
+$es_pagina_interna = $es_dashboard || $es_dashboard_usuario;
+$es_usuario_logueado = isset($_SESSION['id_usu']);
+$mostrar_modal_desarrollador = !$es_pagina_interna && !$es_usuario_logueado;
 ?>
 
 <!-- Footer Global -->
@@ -20,9 +27,9 @@ $path = $is_in_direcciones ? "../" : "";
                 <h3>🥗 Salud Juárez</h3>
                 <p>Plataforma de restaurantes saludables en Ciudad Juárez</p>
                 <ul class="footer-links">
-                    <li><a href="<?php echo $path; ?>index.php">Inicio</a></li>
-                    <li><a href="<?php echo $path; ?>signup.php">Registrarse</a></li>
-                    <li><a href="<?php echo $path; ?>login.php">Iniciar Sesión</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/dashboard_usuario.php">Inicio</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/buscar_restaurantes.php">Explorar</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/mis_favoritos.php">Favoritos</a></li>
                 </ul>
             </div>
             
@@ -63,11 +70,13 @@ $path = $is_in_direcciones ? "../" : "";
     </div>
 </footer>
 
-<!-- Incluir Modal del Desarrollador -->
+<?php if ($mostrar_modal_desarrollador): ?>
+<!-- Incluir Modal del Desarrollador (solo para index.html y usuarios no logueados) -->
 <?php include_once 'modal_desarrollador.php'; ?>
 
 <!-- Scripts Globales -->
 <script src="<?php echo $path; ?>JS/modal_desarrollador.js"></script>
+<?php endif; ?>
 
 <!-- Scripts de rendimiento y análisis -->
 <script>

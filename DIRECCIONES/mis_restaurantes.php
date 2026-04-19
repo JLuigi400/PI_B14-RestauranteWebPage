@@ -358,9 +358,9 @@ $restaurantes = $stmt_restaurantes->get_result();
                             </div>
                             
                             <div class="card-actions">
-                                <a href="editar_perfil_restaurante.php?id=<?php echo $restaurante['id_res']; ?>" class="btn-action btn-primary">
+                                <button class="btn-action btn-primary" onclick="abrirModalEditarRestaurante(<?php echo $restaurante['id_res']; ?>)">
                                     📝 Editar Perfil
-                                </a>
+                                </button>
                                 <a href="gestion_platillos.php?id=<?php echo $restaurante['id_res']; ?>" class="btn-action btn-success">
                                     🍽️ Platillos
                                 </a>
@@ -411,6 +411,43 @@ $restaurantes = $stmt_restaurantes->get_result();
             }
             return false;
         }
+    </script>
+<!-- Scripts -->
+    <script src="../JS/editar_restaurante.js"></script>
+    <script>
+        function abrirModalEditarRestaurante(idRes) {
+            fetch(`../DIRECCIONES/componentes/modal_editar_restaurante.php?id_res=${idRes}`)
+                .then(response => response.text())
+                .then(html => {
+                    // Crear contenedor para el modal
+                    const modalContainer = document.createElement('div');
+                    modalContainer.innerHTML = html;
+                    document.body.appendChild(modalContainer);
+
+                    // Inicializar la clase del modal
+                    if (window.editarRestauranteInstance) {
+                        window.editarRestauranteInstance.destroy();
+                    }
+                    window.editarRestauranteInstance = new EditarRestaurante();
+                })
+                .catch(error => {
+                    console.error('Error al cargar el modal:', error);
+                    alert('Error al cargar el formulario de edición');
+                });
+        }
+
+        // Verificar si se debe abrir el modal automáticamente
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const modal = urlParams.get('modal');
+            const id = urlParams.get('id');
+            
+            if (modal === 'editar' && id) {
+                setTimeout(() => {
+                    abrirModalEditarRestaurante(id);
+                }, 500);
+            }
+        });
     </script>
 </body>
 </html>

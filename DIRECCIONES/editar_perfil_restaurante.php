@@ -28,9 +28,9 @@ if (!$restaurante) {
     exit();
 }
 
-// Si no se especificó ID, usar el primer restaurante del usuario
+// Si no se especificó ID, redirigir al modal de edición más completo
 if ($id_res_get == 0) {
-    header("Location: editar_perfil_restaurante.php?id=" . $restaurante['id_res']);
+    header("Location: mis_restaurantes.php?modal=editar&id=" . $restaurante['id_res']);
     exit();
 }
 

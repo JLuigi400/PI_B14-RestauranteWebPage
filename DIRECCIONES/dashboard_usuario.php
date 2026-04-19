@@ -74,13 +74,30 @@ $nombre_usuario = $_SESSION['nombre_completo'] ?? $_SESSION['nick'];
                     <p>Accede rápido a tus restaurantes preferidos</p>
                 </div>
                 <div class="favoritos-grid" id="favoritos-container">
-                    <!-- Los favoritos se cargarán dinámicamente -->
+                    <!-- Los favoritos se cargarán dinámicamente desde mis_favoritos.php -->
                     <div class="loading-placeholder">
                         <div class="spinner"></div>
                         <p>Cargando tus favoritos...</p>
                     </div>
                 </div>
             </div>
+            
+            <!-- Script para cargar favoritos dinámicamente -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Cargar los favoritos desde mis_favoritos.php
+                    fetch('mis_favoritos.php?ajax=1')
+                        .then(response => response.text())
+                        .then(html => {
+                            document.getElementById('favoritos-container').innerHTML = html;
+                        })
+                        .catch(error => {
+                            console.error('Error al cargar favoritos:', error);
+                            document.getElementById('favoritos-container').innerHTML = 
+                                '<div class="error-message">Error al cargar favoritos</div>';
+                        });
+                });
+            </script>
 
             <!-- Sección de Acciones Rápidas -->
             <div class="dashboard-section">

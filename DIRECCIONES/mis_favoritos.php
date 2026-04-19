@@ -8,6 +8,71 @@ if (!isset($_SESSION['id_usu']) || $_SESSION['id_rol'] != 3) {
     exit();
 }
 
+// Si es una petición AJAX, solo devolver el HTML de los favoritos
+if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
+    // Obtener restaurantes favoritos del usuario
+    $stmt_favoritos = $conn->prepare("
+        SELECT r.*, 
+               COUNT(DISTINCT p.id_pla) as total_platillos,
+               COUNT(DISTINCT CASE WHEN p.visible = 1 THEN p.id_pla END) as platillos_visibles,
+               CASE 
+                   WHEN AVG(pi.cantidad_usada * i.calorias_base) <= 500 AND COUNT(DISTINCT i.es_ingrediente_secreto) = 0 THEN 'oro'
+                   WHEN AVG(pi.cantidad_usada * i.calorias_base) <= 800 AND COUNT(DISTINCT i.es_ingrediente_secreto) <= 2 THEN 'plata'
+                   ELSE 'bronce'
+               END as certificacion,
+               f.fecha_agregado as fecha_favorito
+        FROM favoritos f
+        JOIN restaurante r ON f.id_res = r.id_res
+        LEFT JOIN platillos p ON r.id_res = p.id_res
+        LEFT JOIN platillo_ingredientes pi ON p.id_pla = pi.id_pla
+        LEFT JOIN inventario i ON pi.id_inv = i.id_inv
+        WHERE f.id_usu = ? AND r.estatus_res = 1
+        GROUP BY r.id_res, f.fecha_agregado
+        ORDER BY f.fecha_agregado DESC
+        LIMIT 6
+    ");
+    $stmt_favoritos->bind_param("i", $id_usuario);
+    $stmt_favoritos->execute();
+    $favoritos = $stmt_favoritos->get_result();
+
+    // Generar HTML de las tarjetas de favoritos
+    ob_start();
+    while ($favorito = mysqli_fetch_assoc($favoritos)) {
+        ?>
+        <div class="favorito-card">
+            <div class="favorito-header">
+                <img src="../<?php echo $favorito['logo_res'] ?: 'UPLOADS/RESTAURANTES/default_logo.png'; ?>" 
+                     alt="<?php echo htmlspecialchars($favorito['nombre_res']); ?>" 
+                     class="favorito-logo">
+                <div class="favorito-info">
+                    <h3><?php echo htmlspecialchars($favorito['nombre_res']); ?></h3>
+                    <div class="favorito-meta">
+                        <span class="certificacion-<?php echo $favorito['certificacion']; ?>">
+                            <?php echo ucfirst($favorito['certificacion']); ?>
+                        </span>
+                        <span class="platillos-count">
+                            <?php echo $favorito['platillos_visibles']; ?> platillos
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="favorito-actions">
+                <a href="ver_menu.php?id=<?php echo $favorito['id_res']; ?>" class="btn-favorito btn-primary">
+                    🍽️ Ver Menú
+                </a>
+                <button class="btn-favorito btn-danger" onclick="eliminarFavorito(<?php echo $favorito['id_res']; ?>)">
+                    ❤️ Eliminar
+                </button>
+            </div>
+        </div>
+        <?php
+    }
+    
+    $html = ob_get_clean();
+    echo $html;
+    exit;
+}
+
 $id_usuario = $_SESSION['id_usu'];
 
 // Obtener restaurantes favoritos del usuario

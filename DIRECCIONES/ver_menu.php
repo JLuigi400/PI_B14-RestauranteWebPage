@@ -11,7 +11,8 @@ if ($id_res <= 0) {
 
 // 1) Datos del restaurante
 $stmt_res = $conn->prepare("
-    SELECT id_res, nombre_res, direccion_res, sector_res, telefono_res, url_web, logo_res, banner_res, estatus_res
+    SELECT id_res, nombre_res, direccion_res, sector_res, telefono_res, url_web, logo_res, banner_res, estatus_res,
+           latitud, longitud, descripcion_res
     FROM restaurante
     WHERE id_res = ?
     LIMIT 1
@@ -104,6 +105,147 @@ function obtenerIngredientesPlatillo($conn, $id_pla) {
             background-size: cover;
             background-position: center;
             color: #fff;
+        }
+        
+        /* Estilos para formulario de solicitudes */
+        .sj-form {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .sj-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .sj-form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sj-label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .sj-input, .sj-textarea {
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .sj-input:focus, .sj-textarea:focus {
+            outline: none;
+            border-color: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+        }
+        
+        .sj-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .sj-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .sj-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sj-btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .sj-btn-primary:hover {
+            background: #2ecc71;
+        }
+        
+        .sj-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .sj-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Estilos para mapa */
+        .sj-map-container {
+            margin-top: 20px;
+        }
+        
+        .sj-map {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        
+        /* Estilos para información de ubicación */
+        .sj-location-info {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .sj-location-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .sj-location-item strong {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .sj-location-item p {
+            margin: 0;
+            color: #495057;
+        }
+        
+        .sj-location-item a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        
+        .sj-location-item a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .sj-form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .sj-form-actions {
+                justify-content: stretch;
+            }
         }
     </style>
 </head>
@@ -302,6 +444,82 @@ function obtenerIngredientesPlatillo($conn, $id_pla) {
                 cerrarModalIngredientes();
             }
         });
+        
+        // Manejar formulario de solicitudes a domicilio
+        document.addEventListener('DOMContentLoaded', function() {
+            const formSolicitud = document.getElementById('formSolicitudDomicilio');
+            if (formSolicitud) {
+                formSolicitud.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    enviarSolicitudDomicilio();
+                });
+            }
+            
+            // Inicializar mapa si existe
+            const mapaRestaurante = document.getElementById('mapaRestaurante');
+            if (mapaRestaurante && <?php echo (isset($restaurante['latitud']) && isset($restaurante['longitud'])) ? 'true' : 'false'; ?>) {
+                // Inicializar mapa Leaflet
+                const mapa = L.map('mapaRestaurante').setView([
+                    <?php echo $restaurante['latitud']; ?>, 
+                    <?php echo $restaurante['longitud']; ?>
+                ], 15);
+
+                // Agregar capa de OpenStreetMap
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 18
+                }).addTo(mapa);
+
+                // Marcador del restaurante
+                const iconoRestaurante = L.divIcon({
+                    html: '<div style="background: #27ae60; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold;">🍽</div>',
+                    iconSize: [30, 30],
+                    className: 'restaurante-marker'
+                });
+
+                L.marker([
+                    <?php echo $restaurante['latitud']; ?>, 
+                    <?php echo $restaurante['longitud']; ?>
+                ], { icon: iconoRestaurante })
+                    .bindPopup('<?php echo htmlspecialchars($restaurante['nombre_res']); ?>')
+                    .addTo(mapa);
+            }
+        });
+        
+        function enviarSolicitudDomicilio() {
+            const form = document.getElementById('formSolicitudDomicilio');
+            const submitBtn = form.querySelector('.sj-btn-primary');
+            const btnText = submitBtn.querySelector('.sj-btn-text');
+            const btnLoading = submitBtn.querySelector('.sj-btn-loading');
+            
+            // Validar formulario
+            const nombre = form.nombre_cliente.value.trim();
+            const telefono = form.telefono_cliente.value.trim();
+            const direccion = form.direccion_entrega.value.trim();
+            
+            if (!nombre || !telefono || !direccion) {
+                alert('Por favor completa todos los campos requeridos');
+                return;
+            }
+            
+            // Mostrar estado de carga
+            submitBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'flex';
+            
+            // Simular envío (en producción esto iría a un backend)
+            setTimeout(() => {
+                alert('¡Solicitud enviada correctamente! El restaurante te contactará pronto.');
+                
+                // Restaurar botón
+                submitBtn.disabled = false;
+                btnText.style.display = 'flex';
+                btnLoading.style.display = 'none';
+                
+                // Limpiar formulario
+                form.reset();
+            }, 2000);
+        }
     </script>
 
     <style>

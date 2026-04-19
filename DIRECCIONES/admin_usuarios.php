@@ -490,8 +490,29 @@ $stats = $stmt_stats->get_result()->fetch_assoc();
         }
         
         function editarUsuario(idUsuario) {
-            // Aquí podría abrir un modal o redirigir a una página de edición
-            alert('Función de edición de usuario en desarrollo. ID: ' + idUsuario);
+            // Abrir modal de edición de usuario
+            abrirModalEditarUsuario(idUsuario);
+        }
+
+        function abrirModalEditarUsuario(idUsuario) {
+            fetch(`../DIRECCIONES/componentes/modal_editar_usuario.php?id_usu=${idUsuario}`)
+                .then(response => response.text())
+                .then(html => {
+                    // Crear contenedor para el modal
+                    const modalContainer = document.createElement('div');
+                    modalContainer.innerHTML = html;
+                    document.body.appendChild(modalContainer);
+
+                    // Inicializar la clase del modal
+                    if (window.editarUsuarioInstance) {
+                        window.editarUsuarioInstance.destroy();
+                    }
+                    window.editarUsuarioInstance = new EditarUsuario();
+                })
+                .catch(error => {
+                    console.error('Error al cargar el modal:', error);
+                    alert('Error al cargar el formulario de edición');
+                });
         }
         
         function cambiarEstatus(idUsuario, nuevoEstatus) {

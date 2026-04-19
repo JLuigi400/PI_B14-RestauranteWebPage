@@ -409,7 +409,6 @@ $ingredientes_bajos = $stmt_stock_bajo->get_result();
     
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="../JS/mapa_salud_juarez.js"></script>
     
     <script>
         let mapa = null;
@@ -418,8 +417,122 @@ $ingredientes_bajos = $stmt_stock_bajo->get_result();
         let categoriaActual = 'todos';
         let restauranteActual = null;
         
-        // Cargar datos iniciales
-        <?php
+        // Inicializar mapa cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarMapa();
+        });
+        
+        function inicializarMapa() {
+            // Verificar si el contenedor del mapa existe
+            const mapaContainer = document.getElementById('mapa');
+            if (!mapaContainer) {
+                console.error('No se encontró el contenedor del mapa');
+                return;
+            }
+
+            // Inicializar mapa Leaflet
+            mapa = L.map('mapa').setView([31.7200, -106.4600], 11);
+
+            // Agregar capa de OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18
+            }).addTo(mapa);
+
+            // Datos de restaurantes (simulados desde PHP)
+            restaurantesData = <?php 
+                $restaurantes_array = [];
+                while ($restaurante = mysqli_fetch_assoc($restaurantes)) {
+                    if ($restaurante['latitud'] && $restaurante['longitud']) {
+                        $restaurantes_array[] = [
+                            'id_res' => $restaurante['id_res'],
+                            'nombre_res' => $restaurante['nombre_res'],
+                            'latitud' => $restaurante['latitud'],
+                            'longitud' => $restaurante['longitud']
+                        ];
+                    }
+                }
+                echo json_encode($restaurantes_array); 
+            ?>;
+
+            // Datos de proveedores (simulados desde PHP)
+            proveedoresData = <?php 
+                $proveedores_array = [];
+                while ($proveedor = mysqli_fetch_assoc($proveedores)) {
+                    if ($proveedor['latitud'] && $proveedor['longitud']) {
+                        $proveedores_array[] = [
+                            'id_proveedor' => $proveedor['id_proveedor'],
+                            'nombre_tienda' => $proveedor['nombre_tienda'],
+                            'latitud' => $proveedor['latitud'],
+                            'longitud' => $proveedor['longitud'],
+                            'categoria_insumo' => $proveedor['categoria_insumo']
+                        ];
+                    }
+                }
+                echo json_encode($proveedores_array); 
+            ?>;
+
+            // Iconos personalizados
+            const iconoRestaurante = L.divIcon({
+                html: '<div style="background: #27ae60; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-weight: bold;">🍽</div>',
+                iconSize: [20, 20],
+                className: 'restaurante-marker'
+            });
+
+            const iconoProveedor = L.divIcon({
+                html: '<div style="background: #e74c3c; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-weight: bold;">📦</div>',
+                iconSize: [20, 20],
+                className: 'proveedor-marker'
+            });
+
+            // Agregar marcadores de restaurantes
+            restaurantesData.forEach(restaurante => {
+                if (restaurante.latitud && restaurante.longitud) {
+                    const marcador = L.marker([restaurante.latitud, restaurante.longitud], { icon: iconoRestaurante })
+                        .bindPopup(`
+                            <div style="padding: 10px;">
+                                <strong>${restaurante.nombre_res}</strong><br>
+                                <a href="../restaurantes.php?id=${restaurante.id_res}" style="color: #27ae60;">Ver detalles</a>
+                            </div>
+                        `)
+                        .addTo(mapa);
+                }
+            });
+
+            // Agregar marcadores de proveedores
+            proveedoresData.forEach(proveedor => {
+                if (proveedor.latitud && proveedor.longitud) {
+                    const marcador = L.marker([proveedor.latitud, proveedor.longitud], { icon: iconoProveedor })
+                        .bindPopup(`
+                            <div style="padding: 10px;">
+                                <strong>${proveedor.nombre_tienda}</strong><br>
+                                <small>Categoría: ${proveedor.categoria_insumo}</small><br>
+                                <a href="../proveedores.php?id=${proveedor.id_proveedor}" style="color: #e74c3c;">Ver detalles</a>
+                            </div>
+                        `)
+                        .addTo(mapa);
+                }
+            });
+
+            // Ajustar vista para mostrar todos los marcadores
+            const todosLosMarcadores = [];
+            restaurantesData.forEach(r => {
+                if (r.latitud && r.longitud) {
+                    todosLosMarcadores.push([r.latitud, r.longitud]);
+                }
+            });
+            proveedoresData.forEach(p => {
+                if (p.latitud && p.longitud) {
+                    todosLosMarcadores.push([p.latitud, p.longitud]);
+                }
+            });
+
+            if (todosLosMarcadores.length > 0) {
+                mapa.fitBounds(todosLosMarcadores, { padding: [50, 50] });
+            }
+
+            console.log('Mapa de proveedores inicializado correctamente');
+        }
         // Cargar proveedores
         $stmt_proveedores = $conn->prepare("SELECT * FROM proveedores_insumos WHERE estatus_proveedor = 1");
         $stmt_proveedores->execute();

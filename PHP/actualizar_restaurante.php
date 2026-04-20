@@ -88,6 +88,12 @@ try {
         $valores[] = trim($_POST['direccion_res']);
     }
 
+    if (isset($_POST['sector_res'])) {
+        $campos_actualizar[] = "sector_res = ?";
+        $tipos .= 's';
+        $valores[] = trim($_POST['sector_res']);
+    }
+
     if (isset($_POST['id_colonia']) && !empty($_POST['id_colonia'])) {
         $campos_actualizar[] = "id_colonia = ?";
         $tipos .= 'i';

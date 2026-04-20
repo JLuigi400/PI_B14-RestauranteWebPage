@@ -22,6 +22,7 @@ class EditarRestaurante {
 
     initFormEvents() {
         const form = document.getElementById('formEditarRestaurante');
+        
         if (form) {
             form.addEventListener('submit', (e) => this.guardarRestaurante(e));
         }
@@ -48,10 +49,21 @@ class EditarRestaurante {
         const latInput = document.getElementById('latitud');
         const lngInput = document.getElementById('longitud');
         
+        // Validar que los inputs existan antes de leer su valor
+        if (!latInput || !lngInput) {
+            return;
+        }
+        
         this.latitudActual = parseFloat(latInput.value) || 31.7386; // Default: Ciudad Juárez
         this.longitudActual = parseFloat(lngInput.value) || -106.4844;
 
         // Inicializar el mapa
+        const mapContainer = document.getElementById('mapaRestaurante');
+        
+        if (!mapContainer) {
+            return;
+        }
+        
         this.mapa = L.map('mapaRestaurante').setView([this.latitudActual, this.longitudActual], 13);
 
         // Agregar capa de OpenStreetMap
@@ -122,8 +134,7 @@ class EditarRestaurante {
                 this.actualizarUbicacion(parseFloat(lat), parseFloat(lon));
             }
         } catch (error) {
-            console.warn('Error en geocodificación:', error);
-            // No mostrar error al usuario, solo log
+            // Silenciar error de geocodificación
         }
     }
 
@@ -132,13 +143,17 @@ class EditarRestaurante {
 
         const form = event.target;
         const submitBtn = form.querySelector('.sj-btn-primary');
-        const btnText = submitBtn.querySelector('.sj-btn-text');
-        const btnLoading = submitBtn.querySelector('.sj-btn-loading');
+        const btnText = submitBtn?.querySelector('.sj-btn-text');
+        const btnLoading = submitBtn?.querySelector('.sj-btn-loading');
+
+        if (!submitBtn) {
+            return;
+        }
 
         // Mostrar estado de carga
         submitBtn.disabled = true;
-        btnText.style.display = 'none';
-        btnLoading.style.display = 'flex';
+        if (btnText) btnText.style.display = 'none';
+        if (btnLoading) btnLoading.style.display = 'flex';
 
         try {
             // Crear FormData
@@ -184,8 +199,8 @@ class EditarRestaurante {
     }
 
     validarFormulario(form) {
-        const nombre = form.nombre_res.value.trim();
-        const direccion = form.direccion_res.value.trim();
+        const nombre = form.nombre_res?.value?.trim();
+        const direccion = form.direccion_res?.value?.trim();
 
         if (!nombre) {
             this.mostrarNotificacion('El nombre del restaurante es requerido', 'error');
@@ -198,8 +213,8 @@ class EditarRestaurante {
         }
 
         // Validar coordenadas
-        const lat = parseFloat(form.latitud.value);
-        const lng = parseFloat(form.longitud.value);
+        const lat = parseFloat(form.latitud?.value);
+        const lng = parseFloat(form.longitud?.value);
 
         if (!lat || !lng || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
             this.mostrarNotificacion('Por favor selecciona una ubicación válida en el mapa', 'error');
@@ -210,7 +225,7 @@ class EditarRestaurante {
         const validadoSelect = form.validado_admin;
         const motivoRechazo = form.motivo_rechazo;
         
-        if (validadoSelect && validadoSelect.value === '2' && !motivoRechazo.value.trim()) {
+        if (validadoSelect && validadoSelect.value === '2' && !motivoRechazo?.value?.trim()) {
             this.mostrarNotificacion('El motivo de rechazo es requerido cuando se rechaza un restaurante', 'error');
             return false;
         }
@@ -280,6 +295,23 @@ class EditarRestaurante {
         }
     }
 
+    destroy() {
+        // Limpiar el mapa si existe
+        if (this.mapa) {
+            this.mapa.remove();
+            this.mapa = null;
+        }
+        this.marker = null;
+        
+        // Cerrar y remover el modal
+        this.cerrarModal();
+        
+        // Limpiar la instancia global
+        if (window.editarRestauranteInstance === this) {
+            window.editarRestauranteInstance = null;
+        }
+    }
+
     async enviarNotificacionEmail() {
         try {
             // Obtener datos del formulario para el correo
@@ -292,7 +324,6 @@ class EditarRestaurante {
             const userData = await response.json();
             
             if (!userData.success) {
-                console.warn('No se pudo obtener información del usuario para el correo');
                 return;
             }
 
@@ -316,15 +347,10 @@ class EditarRestaurante {
             const resultado = await window.emailjsConfig.enviarNotificacionActualizacion(emailData);
             
             if (resultado.success) {
-                console.log('Notificación por correo enviada correctamente');
                 this.mostrarNotificacion('Notificación por correo enviada', 'info');
-            } else {
-                console.error('Error al enviar notificación por correo:', resultado.message);
-                // No mostrar error al usuario, solo log
             }
 
         } catch (error) {
-            console.error('Error en enviarNotificacionEmail:', error);
             // No interrumpir el flujo principal si falla el correo
         }
     }
@@ -339,6 +365,7 @@ class EditarRestaurante {
             'telefono_res': 'Teléfono',
             'url_web': 'Sitio web',
             'direccion_res': 'Dirección',
+            'sector_res': 'Sector/Barrio',
             'id_colonia': 'Colonia',
             'logo_res': 'Logo',
             'banner_res': 'Banner',
@@ -393,7 +420,6 @@ function abrirModalEditarRestaurante(idRes) {
             window.editarRestauranteInstance = new EditarRestaurante();
         })
         .catch(error => {
-            console.error('Error al cargar el modal:', error);
             alert('Error al cargar el formulario de edición');
         });
 }

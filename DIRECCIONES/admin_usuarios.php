@@ -465,6 +465,9 @@ $stats = $stmt_stats->get_result()->fetch_assoc();
         </div>
     </div>
     
+    <!-- Scripts -->
+    <script src="../JS/editar_usuario.js"></script>
+    
     <script>
         function filtrarUsuarios() {
             const busqueda = document.getElementById('busquedaUsuario').value.toLowerCase();

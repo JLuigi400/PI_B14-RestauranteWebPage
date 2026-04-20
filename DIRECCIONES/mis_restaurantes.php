@@ -287,6 +287,10 @@ $restaurantes = $stmt_restaurantes->get_result();
             }
         }
     </style>
+    
+    <!-- Leaflet para mapa del modal -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
     <?php include '../PHP/navbar.php'; ?>
@@ -416,23 +420,42 @@ $restaurantes = $stmt_restaurantes->get_result();
     <script src="../JS/editar_restaurante.js"></script>
     <script>
         function abrirModalEditarRestaurante(idRes) {
-            fetch(`../DIRECCIONES/componentes/modal_editar_restaurante.php?id_res=${idRes}`)
-                .then(response => response.text())
+            const url = `componentes/modal_editar_restaurante.php?id_res=${idRes}`;
+            
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
                 .then(html => {
+                    // Verificar si el HTML contiene el modal
+                    if (!html.includes('modalEditarRestaurante')) {
+                        console.error('Error al cargar modal:', html.substring(0, 500));
+                        alert('Error al cargar el formulario de edición');
+                        return;
+                    }
+                    
                     // Crear contenedor para el modal
                     const modalContainer = document.createElement('div');
                     modalContainer.innerHTML = html;
                     document.body.appendChild(modalContainer);
 
-                    // Inicializar la clase del modal
+                    // Limpiar instancia anterior si existe
                     if (window.editarRestauranteInstance) {
                         window.editarRestauranteInstance.destroy();
+                        window.editarRestauranteInstance = null;
                     }
-                    window.editarRestauranteInstance = new EditarRestaurante();
+
+                    // Dar tiempo al navegador de procesar el DOM antes de inicializar
+                    setTimeout(() => {
+                        window.editarRestauranteInstance = new EditarRestaurante();
+                    }, 100);
                 })
                 .catch(error => {
                     console.error('Error al cargar el modal:', error);
-                    alert('Error al cargar el formulario de edición');
+                    alert('Error al cargar el formulario de edición: ' + error.message);
                 });
         }
 

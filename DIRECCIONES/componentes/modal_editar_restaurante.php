@@ -2,7 +2,7 @@
 // Verificar sesión y permisos
 session_start();
 if (!isset($_SESSION['id_usu'])) {
-    header('Location: ../index.php');
+    echo '<div class="sj-error">Sesión no iniciada. Por favor inicie sesión.</div>';
     exit;
 }
 
@@ -15,16 +15,31 @@ if ($id_res === 0) {
 }
 
 // Conexión a la base de datos
-require_once '../PHP/conexion.php';
+require_once '../../PHP/conexion.php';
+
+// Verificar que la conexión existe
+if (!isset($conn) || !$conn) {
+    echo '<div class="sj-error">Error de conexión a la base de datos</div>';
+    exit;
+}
 
 // Obtener datos del restaurante
 $query = "SELECT r.*, c.nombre_colonia, c.ciudad, c.estado 
           FROM restaurante r 
           LEFT JOIN colonias c ON r.id_colonia = c.id_colonia 
           WHERE r.id_res = ?";
-$stmt = mysqli_prepare($conexion, $query);
+$stmt = mysqli_prepare($conn, $query);
+if (!$stmt) {
+    echo '<div class="sj-error">Error al preparar consulta</div>';
+    exit;
+}
+
 mysqli_stmt_bind_param($stmt, 'i', $id_res);
-mysqli_stmt_execute($stmt);
+if (!mysqli_stmt_execute($stmt)) {
+    echo '<div class="sj-error">Error al ejecutar consulta</div>';
+    exit;
+}
+
 $resultado = mysqli_stmt_get_result($stmt);
 $restaurante = mysqli_fetch_assoc($resultado);
 
@@ -44,7 +59,7 @@ if ($id_rol != 1 && $restaurante['id_usu'] != $id_usuario) {
 
 // Obtener colonias para el select
 $query_colonias = "SELECT id_colonia, nombre_colonia, ciudad, estado FROM colonias WHERE estatus_colonia = 1 ORDER BY nombre_colonia";
-$stmt_colonias = mysqli_prepare($conexion, $query_colonias);
+$stmt_colonias = mysqli_prepare($conn, $query_colonias);
 mysqli_stmt_execute($stmt_colonias);
 $resultado_colonias = mysqli_stmt_get_result($stmt_colonias);
 ?>
@@ -100,9 +115,16 @@ $resultado_colonias = mysqli_stmt_get_result($stmt_colonias);
                     <input type="text" id="direccion_res" name="direccion_res" class="sj-input" 
                            value="<?php echo htmlspecialchars($restaurante['direccion_res']); ?>" required>
                 </div>
-                
+
                 <div class="sj-form-group">
-                    <label for="id_colonia" class="sj-label">Colonia / Sector</label>
+                    <label for="sector_res" class="sj-label">Sector / Barrio</label>
+                    <input type="text" id="sector_res" name="sector_res" class="sj-input"
+                           value="<?php echo htmlspecialchars($restaurante['sector_res']); ?>"
+                           placeholder="Ej: Centro, Zona Norte, Zona Centro">
+                </div>
+
+                <div class="sj-form-group">
+                    <label for="id_colonia" class="sj-label">Colonia</label>
                     <select id="id_colonia" name="id_colonia" class="sj-select">
                         <option value="">Seleccionar colonia...</option>
                         <?php while ($colonia = mysqli_fetch_assoc($resultado_colonias)): ?>
@@ -208,9 +230,7 @@ $resultado_colonias = mysqli_stmt_get_result($stmt_colonias);
     </div>
 </div>
 
-<!-- Scripts -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Script EmailJS -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
 <style>
@@ -488,8 +508,8 @@ $resultado_colonias = mysqli_stmt_get_result($stmt_colonias);
 // Liberar memoria
 mysqli_free_result($resultado);
 mysqli_free_result($resultado_colonias);
-mysqli_close($conexion);
+mysqli_close($conn);
 ?>
 
 <!-- Script de EmailJS -->
-<script src="../JS/emailjs_config.js"></script>
+<script src="../../JS/emailjs_config.js"></script>

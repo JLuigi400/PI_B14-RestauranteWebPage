@@ -25,32 +25,38 @@ $id_usuario = $_SESSION['id_usu'];
 $id_rol = $_SESSION['id_rol'];
 
 if ($id_res === 0) {
-    echo json_encode(['success' => false, 'message' => 'ID de restaurante no válido']);
+    $response = ['success' => false, 'message' => 'ID de restaurante no válido'];
+    error_log("Error ID: " . json_encode($response));
+    echo json_encode($response);
     exit;
 }
 
 try {
     // Obtener datos actuales del restaurante para verificar permisos
     $query_actual = "SELECT id_usu, logo_res, banner_res FROM restaurante WHERE id_res = ?";
-    $stmt_actual = mysqli_prepare($conexion, $query_actual);
+    $stmt_actual = mysqli_prepare($conn, $query_actual);
     mysqli_stmt_bind_param($stmt_actual, 'i', $id_res);
     mysqli_stmt_execute($stmt_actual);
     $resultado_actual = mysqli_stmt_get_result($stmt_actual);
     $restaurante_actual = mysqli_fetch_assoc($resultado_actual);
 
     if (!$restaurante_actual) {
-        echo json_encode(['success' => false, 'message' => 'Restaurante no encontrado']);
+        $response = ['success' => false, 'message' => 'Restaurante no encontrado'];
+        error_log("Error restaurante no encontrado: " . json_encode($response));
+        echo json_encode($response);
         exit;
     }
 
     // Verificar permisos
     if ($id_rol != 1 && $restaurante_actual['id_usu'] != $id_usuario) {
-        echo json_encode(['success' => false, 'message' => 'No tienes permisos para editar este restaurante']);
+        $response = ['success' => false, 'message' => 'No tienes permisos para editar este restaurante'];
+        error_log("Error permisos: " . json_encode($response));
+        echo json_encode($response);
         exit;
     }
 
     // Iniciar transacción
-    mysqli_begin_transaction($conexion);
+    mysqli_begin_transaction($conn);
 
     // Construir consulta dinámica
     $campos_actualizar = [];
@@ -154,7 +160,7 @@ try {
         $tipos .= 'i';
         $valores[] = $id_res;
 
-        $stmt = mysqli_prepare($conexion, $query);
+        $stmt = mysqli_prepare($conn, $query);
         
         // Bind parameters dinámicamente
         mysqli_stmt_bind_param($stmt, $tipos, ...$valores);
@@ -188,7 +194,7 @@ try {
 
             // Actualizar en base de datos
             $query_logo = "UPDATE restaurante SET logo_res = ? WHERE id_res = ?";
-            $stmt_logo = mysqli_prepare($conexion, $query_logo);
+            $stmt_logo = mysqli_prepare($conn, $query_logo);
             mysqli_stmt_bind_param($stmt_logo, 'si', $logo_info['ruta'], $id_res);
             mysqli_stmt_execute($stmt_logo);
         }
@@ -208,14 +214,14 @@ try {
 
             // Actualizar en base de datos
             $query_banner = "UPDATE restaurante SET banner_res = ? WHERE id_res = ?";
-            $stmt_banner = mysqli_prepare($conexion, $query_banner);
+            $stmt_banner = mysqli_prepare($conn, $query_banner);
             mysqli_stmt_bind_param($stmt_banner, 'si', $banner_info['ruta'], $id_res);
             mysqli_stmt_execute($stmt_banner);
         }
     }
 
     // Confirmar transacción
-    mysqli_commit($conexion);
+    mysqli_commit($conn);
 
     // Enviar notificación por EmailJS si se actualizó correctamente
     if ($filas_afectadas > 0) {
@@ -223,26 +229,30 @@ try {
     }
 
     // Respuesta exitosa
-    echo json_encode([
+    $response = [
         'success' => true, 
         'message' => 'Restaurante actualizado correctamente',
-        'updated' => $filas_afectadas > 0
-    ]);
+        'id_res' => $id_res
+    ];
+    error_log("Respuesta exitosa: " . json_encode($response));
+    echo json_encode($response);
 
 } catch (Exception $e) {
     // Revertir transacción
-    mysqli_rollback($conexion);
+    mysqli_rollback($conn);
     
     error_log("Error en actualizar_restaurante.php: " . $e->getMessage());
     
-    echo json_encode([
+    $response = [
         'success' => false, 
         'message' => 'Error al actualizar el restaurante: ' . $e->getMessage()
-    ]);
+    ];
+    error_log("Respuesta de error: " . json_encode($response));
+    echo json_encode($response);
 } finally {
     // Cerrar conexión
-    if (isset($conexion)) {
-        mysqli_close($conexion);
+    if (isset($conn)) {
+        mysqli_close($conn);
     }
 }
 
@@ -337,7 +347,7 @@ function optimizarImagen($ruta, $tipo) {
 function enviarNotificacionEmailBackend($id_res, $id_usuario, $id_rol, $restaurante_actual) {
     try {
         // Obtener información actualizada del restaurante
-        global $conexion;
+        global $conn;
         
         $query_actualizado = "SELECT r.*, u.username_usu, u.correo_usu,
                                    p.nombre_per, p.apellidos_per, p.correo_per
@@ -346,7 +356,7 @@ function enviarNotificacionEmailBackend($id_res, $id_usuario, $id_rol, $restaura
                             LEFT JOIN perfiles p ON u.id_usu = p.id_usu
                             WHERE r.id_res = ?";
         
-        $stmt_actualizado = mysqli_prepare($conexion, $query_actualizado);
+        $stmt_actualizado = mysqli_prepare($conn, $query_actualizado);
         mysqli_stmt_bind_param($stmt_actualizado, 'i', $id_res);
         mysqli_stmt_execute($stmt_actualizado);
         $resultado_actualizado = mysqli_stmt_get_result($stmt_actualizado);

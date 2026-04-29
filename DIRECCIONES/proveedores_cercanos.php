@@ -754,26 +754,32 @@ $ingredientes_bajos = $stmt_stock_bajo->get_result();
         }
         
         function crearSolicitudRapida(idInv) {
-            // Crear solicitud rápida para ingrediente con stock bajo
-            fetch('../PHP/procesar_geolocalizacion.php', {
-                method: 'POST',
+            // Abrir modal B2B para solicitud rápida
+            fetch('componentes/modal_pedido_proveedor.php', {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `accion=crear_solicitud_restock&id_inv=${idInv}&cantidad=20&unidad=unidad&observaciones=Solicitud automática por stock bajo`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('✅ Solicitud de re-stock creada correctamente');
-                    location.reload();
-                } else {
-                    alert('❌ Error: ' + data.message);
                 }
             })
+            .then(response => response.text())
+            .then(html => {
+                // Crear y mostrar modal
+                const modalContainer = document.createElement('div');
+                modalContainer.innerHTML = html;
+                document.body.appendChild(modalContainer);
+                
+                // Auto-seleccionar primer producto disponible si hay
+                setTimeout(() => {
+                    const productoSelect = document.getElementById('id_producto');
+                    if (productoSelect && productoSelect.options.length > 1) {
+                        productoSelect.selectedIndex = 1; // Seleccionar primer producto
+                        actualizarPrecio();
+                    }
+                }, 100);
+            })
             .catch(error => {
-                console.error('Error:', error);
-                alert('❌ Error de conexión');
+                console.error('Error al cargar modal:', error);
+                alert('❌ Error al cargar formulario de pedido');
             });
         }
     </script>

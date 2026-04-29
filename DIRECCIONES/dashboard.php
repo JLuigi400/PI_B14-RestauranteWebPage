@@ -67,6 +67,29 @@ $rol_nombre = $_SESSION['rol_nombre'];
                     </div>
                 </div>
 
+            <?php elseif ($id_rol == 4): // VISTA PROVEEDOR (ROL 4) ?>
+                <?php include '../PHP/alertas/dashboard_alerts.php'; ?>
+                
+                <div class="sj-dashboard-cards">
+                    <div class="sj-dash-card">
+                        <h3>📦 Gestión de Productos</h3>
+                        <p>Administra tu catálogo de productos, precios y disponibilidad para los restaurantes.</p>
+                        <div class="sj-dash-actions">
+                            <a href="proveedor_productos.php" class="sj-action">📋 Mis Productos</a>
+                            <a href="proveedor_pedidos.php" class="sj-action">🛒 Pedidos</a>
+                            <a href="proveedor_perfil.php" class="sj-action">⚙️ Mi Perfil</a>
+                        </div>
+                    </div>
+                    <div class="sj-dash-card">
+                        <h3>📊 Estadísticas</h3>
+                        <p>Revisa el rendimiento de tus productos y el estado de tus pedidos.</p>
+                        <div class="sj-dash-actions">
+                            <a href="proveedor_estadisticas.php" class="sj-action">📈 Reportes</a>
+                            <a href="proveedores_cercanos.php" class="sj-action">🗺️ Visibilidad</a>
+                        </div>
+                    </div>
+                </div>
+
             <?php else: // VISTA COMENSAL (USUARIO 3) ?>
                 <!-- Redirigir al dashboard especializado para usuarios -->
                 <script>
@@ -79,7 +102,7 @@ $rol_nombre = $_SESSION['rol_nombre'];
                             <p>Busca restaurantes saludables y descubre sus platillos disponibles.</p>
                             <div class="sj-dash-actions">
                                 <a href="dashboard_usuario.php" class="sj-action">🗺️ Mi Espacio</a>
-                                <a href="buscar_restaurantes.php" class="sj-action">� Explorar</a>
+                                <a href="buscar_restaurantes.php" class="sj-action"> Explorar</a>
                                 <a href="mis_favoritos.php" class="sj-action">⭐ Favoritos</a>
                             </div>
                         </div>

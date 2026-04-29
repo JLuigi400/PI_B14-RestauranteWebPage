@@ -32,8 +32,8 @@ if (isset($restaurante['estatus_res']) && (int)$restaurante['estatus_res'] !== 1
     exit();
 }
 
-$logo = !empty($restaurante['logo_res']) ? $restaurante['logo_res'] : '../IMG/default_logo.png';
-$banner = !empty($restaurante['banner_res']) ? $restaurante['banner_res'] : '../IMG/default_banner.png';
+$logo = !empty($restaurante['logo_res']) ? '../' . $restaurante['logo_res'] : '../IMG/default_logo.png';
+$banner = !empty($restaurante['banner_res']) ? '../' . $restaurante['banner_res'] : '../IMG/default_banner.png';
 
 // 2) Platillos visibles (Modo dual: si existe id_cat hacemos JOIN; si no, usamos tipo_comida)
 $stmt_pla = null;
@@ -189,6 +189,10 @@ function obtenerIngredientesPlatillo($conn, $id_pla) {
             border-top: 2px solid white;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+        }
+
+        .sj-row {
+            color: #2c3e50;
         }
         
         @keyframes spin {

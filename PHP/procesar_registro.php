@@ -57,48 +57,53 @@ try {
  */
 function registrarUsuario($conn) {
     try {
+        // Iniciar transacción
+        $conn->begin_transaction();
+        
         // Obtener y sanitizar datos
-        $nombre = trim($_POST['nombre'] ?? '');
-        $apellido = trim($_POST['apellido'] ?? '');
-        $nick = trim($_POST['nick'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
+        $nick = trim($_POST['username_usu'] ?? '');
+        $email = trim($_POST['correo_usu'] ?? '');
+        $password = $_POST['password_usu'] ?? '';
+        $confirmar_password = $_POST['confirmar_password'] ?? '';
         $id_rol = intval($_POST['id_rol'] ?? 3); // Por defecto: cliente
-        $telefono = trim($_POST['telefono'] ?? '');
+        $telefono = trim($_POST['telefono_usu'] ?? '');
+        
+        // Debug: Log de contraseñas recibidas
+        error_log("Contraseña recibida: " . $password);
+        error_log("Confirmar contraseña: " . $confirmar_password);
+        error_log("¿Son iguales?: " . ($password === $confirmar_password ? 'SÍ' : 'NO'));
         
         // Validaciones básicas
-        if (empty($nombre) || empty($apellido) || empty($nick) || empty($email) || empty($password)) {
-            return [
-                'success' => false,
-                'message' => 'Todos los campos obligatorios deben ser llenados'
-            ];
+        if (empty($nick) || empty($email) || empty($password)) {
+            throw new Exception('Todos los campos obligatorios deben ser llenados');
         }
         
         // Validar formato de email
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return [
-                'success' => false,
-                'message' => 'El formato del correo electrónico no es válido'
-            ];
+            throw new Exception('El formato del correo electrónico no es válido');
         }
         
         // Validar longitud de contraseña
         if (strlen($password) < 8) {
-            return [
-                'success' => false,
-                'message' => 'La contraseña debe tener al menos 8 caracteres'
-            ];
+            throw new Exception('La contraseña debe tener al menos 8 caracteres');
         }
+        
+        // Validar que las contraseñas coincidan (comparación de texto plano)
+        if ($password !== $confirmar_password) {
+            error_log("ERROR: Las contraseñas no coinciden - Password: '$password', Confirmar: '$confirmar_password'");
+            throw new Exception('Las contraseñas no coinciden');
+        }
+        
+        // Solo después de validar que coinciden, hacer el hash
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        error_log("Hash generado: " . $password_hash);
         
         // Verificar si el email ya existe
         $stmt_email = $conn->prepare("SELECT id_usu FROM usuarios WHERE email_usu = ?");
         $stmt_email->bind_param("s", $email);
         $stmt_email->execute();
         if ($stmt_email->get_result()->num_rows > 0) {
-            return [
-                'success' => false,
-                'message' => 'El correo electrónico ya está registrado'
-            ];
+            throw new Exception('El correo electrónico ya está registrado');
         }
         $stmt_email->close();
         
@@ -107,10 +112,7 @@ function registrarUsuario($conn) {
         $stmt_nick->bind_param("s", $nick);
         $stmt_nick->execute();
         if ($stmt_nick->get_result()->num_rows > 0) {
-            return [
-                'success' => false,
-                'message' => 'El nombre de usuario ya está en uso'
-            ];
+            throw new Exception('El nombre de usuario ya está en uso');
         }
         $stmt_nick->close();
         
@@ -119,12 +121,24 @@ function registrarUsuario($conn) {
         $stmt_rol->bind_param("i", $id_rol);
         $stmt_rol->execute();
         if ($stmt_rol->get_result()->num_rows === 0) {
-            return [
-                'success' => false,
-                'message' => 'El rol seleccionado no es válido'
-            ];
+            throw new Exception('El rol seleccionado no es válido');
         }
         $stmt_rol->close();
+        
+        // Validaciones específicas para Proveedor (rol 4)
+        if ($id_rol == 4) {
+            $nombre_empresa = trim($_POST['nombre_empresa'] ?? '');
+            $tipo_proveedor = trim($_POST['tipo_proveedor'] ?? '');
+            $direccion_proveedor = trim($_POST['direccion_proveedor'] ?? '');
+            $colonia_proveedor = trim($_POST['colonia_proveedor'] ?? '');
+            $ciudad_proveedor = trim($_POST['ciudad_proveedor'] ?? '');
+            $estado_proveedor = trim($_POST['estado_proveedor'] ?? '');
+            $codigo_postal_proveedor = trim($_POST['codigo_postal_proveedor'] ?? '');
+            
+            if (empty($nombre_empresa) || empty($tipo_proveedor) || empty($direccion_proveedor) || empty($colonia_proveedor)) {
+                throw new Exception('Todos los campos del proveedor son obligatorios');
+            }
+        }
         
         // Hash de contraseña
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
@@ -135,15 +149,15 @@ function registrarUsuario($conn) {
         // Insertar nuevo usuario
         $stmt_insert = $conn->prepare("
             INSERT INTO usuarios (
-                nombre_usu, apellido_usu, nick, email_usu, password_usu, 
+                nick, email_usu, password_usu, 
                 id_rol, telefono_usu, token_verificacion, estatus_usu, 
                 fecha_registro, fecha_actualizacion
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
         ");
         
         $stmt_insert->bind_param(
-            "sssssiis", 
-            $nombre, $apellido, $nick, $email, $password_hash, 
+            "sssiis", 
+            $nick, $email, $password_hash, 
             $id_rol, $telefono, $token_verificacion
         );
         
@@ -154,23 +168,63 @@ function registrarUsuario($conn) {
         $id_usuario = $conn->insert_id;
         $stmt_insert->close();
         
+        // Si es Proveedor (rol 4), insertar en tabla proveedores
+        if ($id_rol == 4) {
+            $stmt_proveedor = $conn->prepare("
+                INSERT INTO proveedores (
+                    id_usu, nombre_empresa, nombre_contacto, telefono_proveedor, email_proveedor,
+                    tipo_proveedor, direccion_proveedor, colonia_proveedor, ciudad_proveedor,
+                    estado_proveedor, pais_proveedor, codigo_postal_proveedor, estatus_proveedor,
+                    validado_admin, fecha_registro_proveedor
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'México', ?, 1, 0, NOW())
+            ");
+            
+            $nombre_contacto = $nick; // Usar el nombre de usuario como contacto
+            
+            $stmt_proveedor->bind_param(
+                "issssssssi",
+                $id_usuario, $nombre_empresa, $nombre_contacto, $telefono, $email,
+                $tipo_proveedor, $direccion_proveedor, $colonia_proveedor, $ciudad_proveedor,
+                $estado_proveedor, $codigo_postal_proveedor
+            );
+            
+            if (!$stmt_proveedor->execute()) {
+                throw new Exception("Error al registrar proveedor: " . $stmt_proveedor->error);
+            }
+            
+            $stmt_proveedor->close();
+            
+            error_log("PROVEEDOR REGISTRADO: $nombre_empresa (ID: $id_usuario) - Esperando validación admin");
+        }
+        
+        // Confirmar transacción
+        $conn->commit();
+        
         // Enviar email de verificación (simulado)
         enviarEmailVerificacion($email, $nombre, $token_verificacion);
         
+        $mensaje_exito = ($id_rol == 4) 
+            ? 'Proveedor registrado exitosamente. Tu cuenta será revisada por un administrador antes de ser activada.'
+            : 'Usuario registrado exitosamente. Revisa tu correo para verificar tu cuenta.';
+        
         return [
             'success' => true,
-            'message' => 'Usuario registrado exitosamente. Revisa tu correo para verificar tu cuenta.',
+            'message' => $mensaje_exito,
             'data' => [
                 'id_usuario' => $id_usuario,
-                'nombre' => $nombre,
-                'apellido' => $apellido,
                 'nick' => $nick,
                 'email' => $email,
-                'rol' => $id_rol
+                'rol' => $id_rol,
+                'nombre_empresa' => $nombre_empresa ?? null
             ]
         ];
         
     } catch (Exception $e) {
+        // Revertir transacción si falla
+        if (isset($conn) && $conn->ping($conn)) {
+            $conn->rollback();
+        }
+        
         error_log("Error en registrarUsuario: " . $e->getMessage());
         return [
             'success' => false,

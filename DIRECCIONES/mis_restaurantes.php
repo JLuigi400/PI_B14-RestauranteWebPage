@@ -291,6 +291,9 @@ $restaurantes = $stmt_restaurantes->get_result();
     <!-- Leaflet para mapa del modal -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Script para modal de agregar restaurante -->
+    <script src="../JS/agregar_restaurante.js"></script>
 </head>
 <body>
     <?php include '../PHP/navbar.php'; ?>
@@ -301,7 +304,12 @@ $restaurantes = $stmt_restaurantes->get_result();
                 <h1>🏪 Mis Restaurantes</h1>
                 <p style="color: #666; margin: 5px 0 0 0;">Gestiona tus establecimientos y ubicaciones</p>
             </div>
-            <a href="dashboard.php" class="btn-secondary">← Volver al Panel</a>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-primary" onclick="abrirModalAgregarRestaurante()">
+                    ➕ Agregar Sucursal
+                </button>
+                <a href="dashboard.php" class="btn-secondary">← Volver al Panel</a>
+            </div>
         </div>
         
         <?php if ($restaurantes->num_rows > 0): ?>
@@ -374,6 +382,9 @@ $restaurantes = $stmt_restaurantes->get_result();
                                 <a href="ver_menu.php?id=<?php echo $restaurante['id_res']; ?>" class="btn-action btn-secondary">
                                     👁️ Vista Pública
                                 </a>
+                                <button class="btn-action btn-danger" onclick="confirmarEliminarRestaurante(<?php echo $restaurante['id_res']; ?>, '<?php echo htmlspecialchars($restaurante['nombre_res']); ?>')">
+                                    🚫 Eliminar
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -384,9 +395,9 @@ $restaurantes = $stmt_restaurantes->get_result();
                 <h3>🏪 No tienes restaurantes registrados</h3>
                 <p>Comienza registrando tu primer restaurante para ofrecer tus platillos saludables.</p>
                 <div style="margin-top: 30px;">
-                    <a href="#" class="btn-nuevo-restaurante" onclick="alert('Función de registro próximamente disponible')">
-                        ➕ Registrar Nuevo Restaurante
-                    </a>
+                    <button class="btn-nuevo-restaurante" onclick="abrirModalAgregarRestaurante()">
+                        🏪 Registrar Nuevo Restaurante
+                    </button>
                 </div>
             </div>
         <?php endif; ?>
@@ -457,6 +468,106 @@ $restaurantes = $stmt_restaurantes->get_result();
                     console.error('Error al cargar el modal:', error);
                     alert('Error al cargar el formulario de edición: ' + error.message);
                 });
+        }
+
+        // Función para abrir modal de agregar restaurante
+        function abrirModalAgregarRestaurante() {
+            const url = `componentes/modal_agregar_restaurante.php`;
+            console.log('Cargando modal desde:', url);
+            
+            fetch(url)
+                .then(response => {
+                    console.log('Respuesta fetch:', response.status, response.statusText);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    console.log('HTML recibido, longitud:', html.length);
+                    console.log('HTML contiene modal:', html.includes('modalAgregarRestaurante'));
+                    
+                    // Verificar si el HTML contiene el modal
+                    if (!html.includes('modalAgregarRestaurante')) {
+                        console.error('Error al cargar modal:', html.substring(0, 500));
+                        alert('Error al cargar el formulario de agregar restaurante');
+                        return;
+                    }
+                    
+                    // Crear contenedor para el modal
+                    const modalContainer = document.createElement('div');
+                    modalContainer.innerHTML = html;
+                    document.body.appendChild(modalContainer);
+                    console.log('Modal agregado al DOM');
+
+                    // Dar tiempo al navegador de procesar el DOM antes de inicializar
+                    setTimeout(() => {
+                        console.log('Inicializando AgregarRestaurante...');
+                        window.agregarRestauranteInstance = new AgregarRestaurante();
+                    }, 200);
+                })
+                .catch(error => {
+                    console.error('Error al cargar el modal:', error);
+                    alert('Error al cargar el formulario de agregar: ' + error.message);
+                });
+        }
+
+        // Función para confirmar eliminación de restaurante
+        function confirmarEliminarRestaurante(idRes, nombreRes) {
+            const mensaje = `¿Estás seguro de que deseas eliminar el restaurante "${nombreRes}"?\n\n` +
+                          `Esta acción eliminará:\n` +
+                          `? Todos los platillos asociados\n` +
+                          `? El inventario del restaurante\n` +
+                          `? Todas las configuraciones\n\n` +
+                          `Esta acción no se puede deshacer.`;
+            
+            if (confirm(mensaje)) {
+                eliminarRestaurante(idRes);
+            }
+        }
+
+        // Función para eliminar restaurante
+        async function eliminarRestaurante(idRes) {
+            try {
+                const response = await fetch('../PHP/eliminar_restaurante.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `id_res=${idRes}`
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Restaurante eliminado correctamente');
+                    location.reload();
+                } else {
+                    alert('Error al eliminar restaurante: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error al eliminar restaurante:', error);
+                alert('Error al eliminar restaurante: ' + error.message);
+            }
+        }
+
+        // Función global para cerrar modal de agregar restaurante
+        function cerrarModalAgregarRestaurante() {
+            if (window.agregarRestauranteInstance) {
+                window.agregarRestauranteInstance.destroy();
+                window.agregarRestauranteInstance = null;
+            } else {
+                // Si no existe la instancia, eliminar el modal directamente
+                const modal = document.getElementById('modalAgregarRestaurante');
+                if (modal) {
+                    const modalContainer = modal.closest('.sj-modal-overlay');
+                    if (modalContainer) {
+                        modalContainer.remove();
+                    } else {
+                        modal.remove();
+                    }
+                }
+            }
         }
 
         // Verificar si se debe abrir el modal automáticamente

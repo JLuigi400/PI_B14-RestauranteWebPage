@@ -45,7 +45,9 @@ htdocs_backup/
 
 # CARPETAS Y ARCHIVOS LOCALES QUE NO SE SUBEN A GITHUB
 # Screenshots locales (evidencia de desarrollo)
+# Información local de parte del desarrollador
 _screenshots/
+_informacion/
 
 # SaveStates locales (respaldo de código)
 SaveStates/

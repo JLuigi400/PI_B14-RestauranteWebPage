@@ -17,7 +17,9 @@ document.addEventListener("DOMContentLoaded", function() {
         'DIRECCIONES/inventario/',
         'DIRECCIONES/gestion_platillos.php',
         'DIRECCIONES/buscar_restaurantes.php',
-        'DIRECCIONES/mis_favoritos.php'
+        'DIRECCIONES/mis_favoritos.php',
+        'DIRECCIONES/proveedor_productos.php',
+        'DIRECCIONES/proveedor_pedidos.php'
     ];
     
     // Páginas públicas
@@ -41,7 +43,12 @@ document.addEventListener("DOMContentLoaded", function() {
     // Función para verificar sesión
     async function checkSession() {
         try {
-            const response = await fetch('PHP/check_session.php', {
+            // Determinar la ruta correcta según la ubicación actual
+            const currentPath = window.location.pathname;
+            const isInDirecciones = currentPath.includes('/DIRECCIONES/');
+            const checkSessionUrl = isInDirecciones ? '../PHP/check_session.php' : 'PHP/check_session.php';
+            
+            const response = await fetch(checkSessionUrl, {
                 method: 'GET',
                 credentials: 'same-origin'
             });

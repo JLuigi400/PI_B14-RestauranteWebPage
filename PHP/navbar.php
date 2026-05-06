@@ -43,6 +43,10 @@ $is_logged = isset($_SESSION['id_usu']);
                 <?php elseif ($id_rol == 3): // Comensal ?>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/buscar_restaurantes.php">Explorar</a></li>
                     <li><a href="<?php echo $path; ?>DIRECCIONES/mis_favoritos.php">Favoritos</a></li>
+                <?php elseif ($id_rol == 4): // Proveedor ?>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/proveedor_productos.php">Mis Productos</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/proveedor_pedidos.php">Pedidos</a></li>
+                    <li><a href="<?php echo $path; ?>DIRECCIONES/proveedores_cercanos.php">Visibilidad</a></li>
                 <?php endif; ?>
                 
                 <li class="user-menu">

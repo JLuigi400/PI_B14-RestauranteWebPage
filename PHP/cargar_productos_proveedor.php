@@ -12,7 +12,22 @@ if (!isset($_SESSION['id_usu']) || $_SESSION['id_rol'] != 4) {
 header('Content-Type: application/json');
 
 try {
-    $id_proveedor = $_SESSION['id_usu'];
+    $id_usu = $_SESSION['id_usu'];
+
+    // Primero obtener el id_proveedor correspondiente al id_usu
+    $sql_proveedor = "SELECT id_proveedor FROM proveedores WHERE id_usu = ?";
+    $stmt_proveedor = $conn->prepare($sql_proveedor);
+    $stmt_proveedor->bind_param("i", $id_usu);
+    $stmt_proveedor->execute();
+    $result_proveedor = $stmt_proveedor->get_result();
+    
+    if ($result_proveedor->num_rows === 0) {
+        echo json_encode(['success' => false, 'message' => 'Proveedor no encontrado']);
+        exit();
+    }
+    
+    $proveedor_data = $result_proveedor->fetch_assoc();
+    $id_proveedor = $proveedor_data['id_proveedor'];
 
     // Obtener productos del proveedor
     $sql = "SELECT 

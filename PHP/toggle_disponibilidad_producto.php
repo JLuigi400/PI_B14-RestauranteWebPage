@@ -17,7 +17,22 @@ try {
     
     $id_producto = intval($data['id_producto'] ?? 0);
     $disponibilidad = intval($data['disponibilidad'] ?? 0);
-    $id_proveedor = $_SESSION['id_usu'];
+    
+    // Obtener id_proveedor desde la tabla proveedores usando id_usu de sesión
+    $id_usu = $_SESSION['id_usu'];
+    $sql_proveedor = "SELECT id_proveedor FROM proveedores WHERE id_usu = ?";
+    $stmt_proveedor = $conn->prepare($sql_proveedor);
+    $stmt_proveedor->bind_param("i", $id_usu);
+    $stmt_proveedor->execute();
+    $result_proveedor = $stmt_proveedor->get_result();
+    
+    if ($result_proveedor->num_rows === 0) {
+        echo json_encode(['success' => false, 'message' => 'Proveedor no encontrado']);
+        exit();
+    }
+    
+    $proveedor_data = $result_proveedor->fetch_assoc();
+    $id_proveedor = $proveedor_data['id_proveedor'];
 
     // Validaciones
     if ($id_producto <= 0) {

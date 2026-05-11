@@ -26,6 +26,9 @@ class GestionPedidosProveedor {
     }
 
     async cargarPedidos() {
+        // Mostrar notificación de carga
+        this.mostrarNotificacion('Actualizando pedidos...', 'info');
+        
         try {
             const response = await fetch('../PHP/cargar_pedidos_proveedor.php', {
                 method: 'GET',
@@ -35,8 +38,24 @@ class GestionPedidosProveedor {
             const data = await response.json();
             
             if (data.success) {
+                // Comparar con datos anteriores para detectar cambios
+                const pedidosAnteriores = this.pedidos.length;
+                const nuevosPedidos = data.pedidos.length;
+                
                 this.pedidos = data.pedidos;
                 this.renderizarPedidos();
+                
+                // Notificar cambios si hay nuevos pedidos
+                if (nuevosPedidos > pedidosAnteriores) {
+                    const nuevos = nuevosPedidos - pedidosAnteriores;
+                    this.mostrarNotificacion(`Tienes ${nuevos} nuevo(s) pedido(s)`, 'success');
+                } else {
+                    this.mostrarNotificacion('Pedidos actualizados correctamente', 'success');
+                }
+                
+                // Actualizar timestamp de última actualización
+                this.ultimaActualizacion = new Date();
+                
             } else {
                 this.mostrarNotificacion('Error al cargar los pedidos', 'error');
             }
@@ -355,6 +374,43 @@ class GestionPedidosProveedor {
         }, 3000);
     }
 }
+
+// Hacer funciones globales para onclick
+window.cargarPedidos = function() {
+    if (window.gestionPedidos) {
+        window.gestionPedidos.cargarPedidos();
+    }
+};
+
+window.verDetalles = function(idPedido) {
+    if (window.gestionPedidos) {
+        window.gestionPedidos.verDetalles(idPedido);
+    }
+};
+
+window.confirmarPedido = function(idPedido) {
+    if (window.gestionPedidos) {
+        window.gestionPedidos.confirmarPedido(idPedido);
+    }
+};
+
+window.enviarPedido = function(idPedido) {
+    if (window.gestionPedidos) {
+        window.gestionPedidos.enviarPedido(idPedido);
+    }
+};
+
+window.entregarPedido = function(idPedido) {
+    if (window.gestionPedidos) {
+        window.gestionPedidos.entregarPedido(idPedido);
+    }
+};
+
+window.cancelarPedido = function(idPedido) {
+    if (window.gestionPedidos) {
+        window.gestionPedidos.cancelarPedido(idPedido);
+    }
+};
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {

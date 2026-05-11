@@ -46,8 +46,10 @@ htdocs_backup/
 # CARPETAS Y ARCHIVOS LOCALES QUE NO SE SUBEN A GITHUB
 # Screenshots locales (evidencia de desarrollo)
 # Información local de parte del desarrollador
+# Información Scripts de Aris
 _screenshots/
 _informacion/
+_aris_scripts/
 
 # SaveStates locales (respaldo de código)
 SaveStates/

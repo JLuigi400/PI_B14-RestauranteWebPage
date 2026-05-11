@@ -40,11 +40,15 @@ if ($is_local) {
 
 // Verificación de la conexión
 if ($conn->connect_error) {
-    die("❌ Error de conexión: " . $conn->connect_error);
+    // En lugar de matar el script, registramos el error y continuamos
+    error_log("ERROR BD: " . $conn->connect_error);
+    $conn = null; // Establecemos conn como null para indicar error
 }
 
 // Establecer el juego de caracteres a UTF-8 para evitar problemas con tildes y la 'ñ'
-$conn->set_charset("utf8");
+if ($conn) {
+    $conn->set_charset("utf8");
+}
 
 /* NOTAS DE USO:
    1. Si ves el mensaje "Error de conexión", revisa que el $password en el Bloque 2 sea correcto.

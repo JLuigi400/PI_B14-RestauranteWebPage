@@ -58,6 +58,18 @@ try {
     // Iniciar transacción
     mysqli_begin_transaction($conn);
 
+    // TRIGGER REPLICADO EN PHP: log_validacion_restaurante
+    // Obtener valor anterior de validado_admin si se va a actualizar
+    $validado_admin_anterior = null;
+    if ($id_rol == 1 && isset($_POST['validado_admin'])) {
+        $stmt_old = mysqli_prepare($conn, "SELECT validado_admin FROM restaurante WHERE id_res = ?");
+        mysqli_stmt_bind_param($stmt_old, 'i', $id_res);
+        mysqli_stmt_execute($stmt_old);
+        $result_old = mysqli_stmt_get_result($stmt_old);
+        $datos_old = mysqli_fetch_assoc($result_old);
+        $validado_admin_anterior = $datos_old ? (int)$datos_old['validado_admin'] : null;
+    }
+
     // Construir consulta dinámica
     $campos_actualizar = [];
     $tipos = '';
@@ -217,6 +229,40 @@ try {
             $stmt_banner = mysqli_prepare($conn, $query_banner);
             mysqli_stmt_bind_param($stmt_banner, 'si', $banner_info['ruta'], $id_res);
             mysqli_stmt_execute($stmt_banner);
+        }
+    }
+
+    // TRIGGER REPLICADO EN PHP: log_validacion_restaurante (continuación)
+    // Insertar en validacion_log si cambió validado_admin
+    if ($id_rol == 1 && isset($_POST['validado_admin']) && $validado_admin_anterior !== null) {
+        $validado_nuevo = (int)$_POST['validado_admin'];
+        
+        // Solo registrar si realmente cambió
+        if ($validado_nuevo !== $validado_admin_anterior) {
+            // Determinar la acción
+            if ($validado_nuevo == 1 && $validado_admin_anterior == 0) {
+                $accion = 'validado';
+            } elseif ($validado_nuevo == 0 && $validado_admin_anterior == 1) {
+                $accion = 'detenido';
+            } else {
+                $accion = 'reactivado';
+            }
+            
+            // Obtener motivo de rechazo si existe
+            $motivo = null;
+            if ($validado_nuevo == 2 && isset($_POST['motivo_rechazo'])) {
+                $motivo = trim($_POST['motivo_rechazo']);
+            }
+            
+            // Insertar en validacion_log
+            $query_log = "INSERT INTO validacion_log (id_res, id_admin, accion, motivo, fecha_accion) VALUES (?, ?, ?, ?, NOW())";
+            $stmt_log = mysqli_prepare($conn, $query_log);
+            mysqli_stmt_bind_param($stmt_log, 'iiss', $id_res, $id_usuario, $accion, $motivo);
+            
+            if (!mysqli_stmt_execute($stmt_log)) {
+                error_log("Error registrando en validacion_log: " . mysqli_stmt_error($stmt_log));
+                // No lanzar excepción para no interrumpir el flujo principal
+            }
         }
     }
 

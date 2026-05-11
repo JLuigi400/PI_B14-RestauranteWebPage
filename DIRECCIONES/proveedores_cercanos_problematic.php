@@ -1,9 +1,4 @@
 <?php
-// PASO 01: Activar Visualización de Errores (Aris)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 include '../PHP/db_config.php';
 
@@ -15,32 +10,35 @@ if (!isset($_SESSION['id_usu']) || $_SESSION['id_rol'] != 2) {
 
 $id_usuario = $_SESSION['id_usu'];
 
-// PASO 03: Obtener restaurantes del usuario con control de errores (Aris)
+// Obtener restaurantes del usuario
 $stmt_restaurantes = $conn->prepare("
     SELECT id_res, nombre_res, latitud, longitud 
     FROM restaurante 
     WHERE id_usu = ? AND estatus_res = 1
 ");
-if (!$stmt_restaurantes) {
-    die("Error en la preparación de restaurantes: " . $conn->error);
-}
 $stmt_restaurantes->bind_param("i", $id_usuario);
 $stmt_restaurantes->execute();
 $restaurantes = $stmt_restaurantes->get_result();
 
-// PASO 02: Obtener categorías de proveedores CORREGIDO (Aris)
-// Usamos la tabla tipos_proveedores - CORREGIDO: usar id_tipo_proveedor para value
+// Obtener categorías de proveedores
 $stmt_categorias = $conn->prepare("
-    SELECT id_tipo_proveedor, nombre_tipo 
-    FROM tipos_proveedores 
-    WHERE activo = 1 
-    ORDER BY nombre_tipo ASC
+    SELECT DISTINCT tipo_proveedor 
+    FROM proveedores 
+    WHERE estado_visibilidad = 'activo' 
+    ORDER BY tipo_proveedor ASC
 ");
-if (!$stmt_categorias) {
-    die("Error en la preparación de categorías: " . $conn->error);
-}
 $stmt_categorias->execute();
 $categorias = $stmt_categorias->get_result();
+
+// Obtener proveedores activos para el mapa
+$stmt_proveedores = $conn->prepare("
+    SELECT id_proveedor, nombre_empresa, tipo_proveedor, latitud_proveedor, longitud_proveedor, telefono, direccion_empresa
+    FROM proveedores 
+    WHERE estado_visibilidad = 'activo' 
+    ORDER BY nombre_empresa ASC
+");
+$stmt_proveedores->execute();
+$proveedores_reales = $stmt_proveedores->get_result();
 
 // Obtener ingredientes con stock bajo para alertas
 $stmt_stock_bajo = $conn->prepare("
@@ -156,16 +154,10 @@ $ingredientes_bajos = $stmt_stock_bajo->get_result();
         }
         
         .categoria-filtros {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-bottom: 20px;
-        }
-        
-        .categoria-filtros select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            background: white;
         }
         
         .categoria-btn {
@@ -232,82 +224,61 @@ $ingredientes_bajos = $stmt_stock_bajo->get_result();
             margin-top: 8px;
         }
         
-        /* Alertas como Tarjetas Visuales */
         .alertas-section {
-            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
-            border-left: 5px solid #fc8181;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
         }
         
-        .alertas-header {
+        .alertas-section h4 {
+            color: #856404;
+            margin: 0 0 10px 0;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            color: #c53030;
-            font-size: 1.3em;
-            font-weight: bold;
+            gap: 8px;
         }
         
-        .alerta-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
+        .alerta-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
+            padding: 8px 0;
+            border-bottom: 1px solid #ffeaa7;
         }
         
-        .alerta-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .alerta-item:last-child {
+            border-bottom: none;
         }
         
-        .alerta-info h4 {
-            margin: 0 0 5px 0;
-            color: #2d3748;
-            font-size: 1.1em;
+        .alerta-info {
+            flex: 1;
         }
         
-        .alerta-info p {
-            margin: 0;
-            color: #718096;
-            font-size: 0.9em;
-        }
-        
-        .alerta-cantidad {
-            background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
+        .alerta-nombre {
             font-weight: bold;
-            font-size: 0.9em;
-            margin-right: 15px;
+            color: #856404;
+        }
+        
+        .alerta-stock {
+            color: #dc3545;
+            font-weight: bold;
         }
         
         .btn-solicitud {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            background: #e74c3c;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.9em;
-            font-weight: 600;
+            font-size: 0.8em;
             transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(72, 187, 120, 0.3);
         }
         
         .btn-solicitud:hover {
-            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(72, 187, 120, 0.4);
+            background: #c0392b;
         }
         
         .empty-state {
@@ -353,31 +324,22 @@ $ingredientes_bajos = $stmt_stock_bajo->get_result();
                 <h1>📦 Proveedores Cercanos</h1>
                 <p style="color: #666; margin: 5px 0 0 0;">Encuentra proveedores de insumos cerca de tus restaurantes</p>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <a href="solicitar_pedido_proveedor.php" class="btn-primary" style="background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                    🛒 Crear Pedido B2B
-                </a>
-                <a href="mis_restaurantes.php" class="btn-secondary" style="background: #34495e; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none;">← Mis Restaurantes</a>
-            </div>
+            <a href="mis_restaurantes.php" class="btn-secondary">← Mis Restaurantes</a>
         </div>
         
         <?php if ($ingredientes_bajos->num_rows > 0): ?>
             <div class="alertas-section">
-                <div class="alertas-header">
-                    ⚠️ Alertas de Stock Bajo
-                </div>
+                <h4>⚠️ Alertas de Stock Bajo</h4>
                 <?php while ($ingrediente = $ingredientes_bajos->fetch_assoc()): ?>
-                    <div class="alerta-card">
+                    <div class="alerta-item">
                         <div class="alerta-info">
-                            <h4><?php echo htmlspecialchars($ingrediente['nombre_insumo']); ?></h4>
-                            <p><?php echo htmlspecialchars($ingrediente['nombre_res']); ?></p>
+                            <div class="alerta-nombre"><?php echo htmlspecialchars($ingrediente['nombre_insumo']); ?></div>
+                            <div class="alerta-restaurante"><?php echo htmlspecialchars($ingrediente['nombre_res']); ?></div>
                         </div>
-                        <div style="display: flex; align-items: center;">
-                            <span class="alerta-cantidad"><?php echo $ingrediente['stock_inv']; ?> <?php echo htmlspecialchars($ingrediente['medida_inv']); ?></span>
-                            <button class="btn-solicitud" onclick="crearSolicitudRapida(<?php echo $ingrediente['id_inv']; ?>)">
-                                Solicitar
-                            </button>
-                        </div>
+                        <div class="alerta-stock"><?php echo $ingrediente['stock_inv']; ?> <?php echo htmlspecialchars($ingrediente['medida_inv']); ?></div>
+                        <button class="btn-solicitud" onclick="crearSolicitudRapida(<?php echo $ingrediente['id_inv']; ?>)">
+                            Solicitar
+                        </button>
                     </div>
                 <?php endwhile; ?>
             </div>
@@ -427,12 +389,11 @@ $ingredientes_bajos = $stmt_stock_bajo->get_result();
                                 <option value="todos">Todas las categorías</option>
                                 <?php 
                                 // Reiniciar el puntero del resultado para poder volver a usarlo
-                                // CORREGIDO: Usar id_tipo_proveedor como value y nombre_tipo como texto
                                 $categorias->data_seek(0);
                                 while ($categoria = $categorias->fetch_assoc()): 
                                 ?>
-                                    <option value="<?php echo htmlspecialchars($categoria['id_tipo_proveedor']); ?>">
-                                        <?php echo htmlspecialchars($categoria['nombre_tipo']); ?>
+                                    <option value="<?php echo htmlspecialchars($categoria['tipo_proveedor']); ?>">
+                                        <?php echo htmlspecialchars($categoria['tipo_proveedor']); ?>
                                     </option>
                                 <?php endwhile; ?>
                             </select>
@@ -470,6 +431,43 @@ $ingredientes_bajos = $stmt_stock_bajo->get_result();
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <!-- Scripts -->
+    <script>
+        // Datos reales desde PHP para el mapa
+        const restaurantesData = <?php 
+            $restaurantes_array = [];
+            if ($restaurantes->num_rows > 0) {
+                $restaurantes->data_seek(0);
+                while ($restaurante = $restaurantes->fetch_assoc()) {
+                    $restaurantes_array[] = [
+                        'id' => $restaurante['id_res'],
+                        'nombre' => $restaurante['nombre_res'],
+                        'lat' => $restaurante['latitud'],
+                        'lng' => $restaurante['longitud']
+                    ];
+                }
+            }
+            echo json_encode($restaurantes_array); 
+        ?>;
+        
+        const proveedoresData = <?php 
+            $proveedores_array = [];
+            if (isset($proveedores_reales) && $proveedores_reales->num_rows > 0) {
+                $proveedores_reales->data_seek(0);
+                while ($proveedor = $proveedores_reales->fetch_assoc()) {
+                    $proveedores_array[] = [
+                        'id' => $proveedor['id_proveedor'],
+                        'nombre' => $proveedor['nombre_empresa'],
+                        'categoria' => $proveedor['tipo_proveedor'],
+                        'lat' => $proveedor['latitud_proveedor'],
+                        'lng' => $proveedor['longitud_proveedor'],
+                        'telefono' => $proveedor['telefono'],
+                        'direccion' => $proveedor['direccion_empresa']
+                    ];
+                }
+            }
+            echo json_encode($proveedores_array); 
+        ?>;
+    </script>
     <script src="../JS/proveedores_cercanos.js"></script>
     <script src="../JS/session_check.js"></script>
 </body>

@@ -179,7 +179,7 @@ class VisibilidadProveedor {
                     this.marker.setLatLng([latitude, longitude]);
                 }
 
-                this.mostrarNotificación('Ubicación actualizada correctamente', 'success');
+                this.mostrarNotificacion('Ubicación actualizada correctamente', 'success');
             },
             (error) => {
                 console.error('Error de geolocalización:', error);
@@ -221,17 +221,17 @@ class VisibilidadProveedor {
             const data = await response.json();
             
             if (data.success) {
-                this.mostrarNotificación('Opciones de visibilidad guardadas', 'success');
+                this.mostrarNotificacion('Opciones de visibilidad guardadas', 'success');
             } else {
-                this.mostrarNotificación('Error al guardar las opciones', 'error');
+                this.mostrarNotificacion('Error al guardar las opciones', 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            this.mostrarNotificación('Error de conexión', 'error');
+            this.mostrarNotificacion('Error de conexión', 'error');
         }
     }
 
-    mostrarNotificación(mensaje, tipo = 'info') {
+    mostrarNotificacion(mensaje, tipo = 'info') {
         // Crear notificación flotante
         const notificacion = document.createElement('div');
         notificacion.className = `sj-notificación sj-notificación-${tipo}`;

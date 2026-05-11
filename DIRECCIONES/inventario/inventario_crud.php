@@ -40,10 +40,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $id_inv = intval($_POST['id_inv']);
             $nuevo_stock = floatval($_POST['nuevo_stock']);
             
+            // TRIGGER REPLICADO EN PHP: notificar_stock_bajo
+            // Obtener stock anterior antes de actualizar
+            $stmt_old = $conn->prepare("SELECT stock_inv, nombre_insumo, medida_inv FROM inventario WHERE id_inv = ? AND id_res = ?");
+            $stmt_old->bind_param("ii", $id_inv, $id_res);
+            $stmt_old->execute();
+            $result_old = $stmt_old->get_result();
+            $datos_viejos = $result_old->fetch_assoc();
+            $stock_anterior = $datos_viejos ? floatval($datos_viejos['stock_inv']) : 0;
+            $nombre_insumo = $datos_viejos ? $datos_viejos['nombre_insumo'] : 'Insumo';
+            $medida_inv = $datos_viejos ? $datos_viejos['medida_inv'] : 'unidades';
+            
+            // Actualizar el stock
             $stmt = $conn->prepare("UPDATE inventario SET stock_inv = ? WHERE id_inv = ? AND id_res = ?");
             $stmt->bind_param("dii", $nuevo_stock, $id_inv, $id_res);
             
             if ($stmt->execute()) {
+                // Verificar si se debe crear notificación de stock bajo
+                // Condición: nuevo stock <= 5 AND stock anterior > 5
+                if ($nuevo_stock <= 5 && $stock_anterior > 5) {
+                    // Obtener id_usu del restaurante
+                    $stmt_user = $conn->prepare("SELECT id_usu FROM restaurante WHERE id_res = ?");
+                    $stmt_user->bind_param("i", $id_res);
+                    $stmt_user->execute();
+                    $result_user = $stmt_user->get_result();
+                    $datos_user = $result_user->fetch_assoc();
+                    $id_usu = $datos_user ? $datos_user['id_usu'] : 0;
+                    
+                    // Crear notificación
+                    if ($id_usu > 0) {
+                        $titulo = 'Stock Bajo';
+                        $mensaje = "El insumo \"" . $nombre_insumo . "\" tiene stock bajo (" . $nuevo_stock . " " . $medida_inv . ")";
+                        $enlace = "inventario.php?id_res=" . $id_res;
+                        $tipo = 'stock_bajo';
+                        
+                        $stmt_notif = $conn->prepare("
+                            INSERT INTO notificaciones (id_usu, id_res, tipo, titulo, mensaje, enlace, fecha_creacion, leida)
+                            VALUES (?, ?, ?, ?, ?, ?, NOW(), 0)
+                        ");
+                        $stmt_notif->bind_param("iissss", $id_usu, $id_res, $tipo, $titulo, $mensaje, $enlace);
+                        
+                        if (!$stmt_notif->execute()) {
+                            error_log("Error creando notificación de stock bajo: " . $conn->error);
+                        }
+                    }
+                }
+                
                 header("Location: inventario_crud.php?status=stock_updated");
             } else {
                 header("Location: inventario_crud.php?status=error_stock");

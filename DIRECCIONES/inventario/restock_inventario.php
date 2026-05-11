@@ -26,10 +26,175 @@ if (!$restaurante) {
 $id_res = $restaurante['id_res'];
 $nombre_restaurante = $restaurante['nombre_res'];
 
+// Función auxiliar para detectar si es una petición AJAX
+function esAjax() {
+    return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+           strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+}
+
 // Procesar solicitud de re-stock
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $action = $_POST['action'] ?? '';
     
+    // =================================================================
+    // ACCIÓN: Crear Pedido B2B (Transaccional - Reemplazo de Triggers)
+    // =================================================================
+    if ($action == 'crear_pedido_b2b') {
+        $id_proveedor = intval($_POST['id_proveedor'] ?? 0);
+        $proveedor_nombre = $_POST['proveedor_nombre'] ?? '';
+        $notas_pedido = $_POST['notas'] ?? '';
+        $direccion_entrega = $_POST['direccion_entrega'] ?? '';
+        
+        $respuesta = [];
+        
+        // Validar datos mínimos
+        if ($id_proveedor <= 0) {
+            $respuesta = [
+                'success' => false,
+                'message' => 'ID de proveedor no válido'
+            ];
+        } else {
+            // INICIAR TRANSACCIÓN
+            $conn->begin_transaction();
+            
+            try {
+                // 1. INSERT EN pedidos_proveedor
+                $estado_inicial = 'Pendiente';
+                $subtotal = 0.00;
+                $total = 0.00;
+                
+                $stmt_pedido = $conn->prepare("
+                    INSERT INTO pedidos_proveedor 
+                    (id_proveedor, id_restaurante, id_usuario_solicitante, estado_pedido, 
+                     subtotal_productos, total_pedido, direccion_entrega, notas_pedido, fecha_solicitud)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                ");
+                
+                $stmt_pedido->bind_param("iiisddsss", 
+                    $id_proveedor, 
+                    $id_res, 
+                    $id_usuario,
+                    $estado_inicial,
+                    $subtotal,
+                    $total,
+                    $direccion_entrega,
+                    $notas_pedido
+                );
+                
+                if (!$stmt_pedido->execute()) {
+                    throw new Exception("Error insertando pedido: " . $stmt_pedido->error);
+                }
+                
+                // 2. OBTENER ID INSERTADO
+                $id_pedido = $conn->insert_id;
+                
+                // 3. INSERT MASIVO EN detalles_pedido_proveedor
+                $productos_insertados = 0;
+                $detalles_pedido = [];
+                $lista_productos_email = [];
+                $subtotal_acumulado = 0;
+                
+                if (isset($_POST['productos']) && is_array($_POST['productos'])) {
+                    $stmt_detalle = $conn->prepare("
+                        INSERT INTO detalles_pedido_proveedor 
+                        (id_pedido, id_producto, cantidad_solicitada, precio_unitario_pedido, subtotal_detalle)
+                        VALUES (?, ?, ?, ?, ?)
+                    ");
+                    
+                    foreach ($_POST['productos'] as $id_producto => $datos_producto) {
+                        $cantidad = floatval($datos_producto['cantidad'] ?? 0);
+                        $precio = floatval($datos_producto['precio'] ?? 0);
+                        $nombre_producto = $datos_producto['nombre'] ?? 'Producto';
+                        
+                        if ($cantidad > 0) {
+                            $subtotal_detalle = $cantidad * $precio;
+                            $precio_unitario = $precio > 0 ? $precio : 0;
+                            
+                            $stmt_detalle->bind_param("iiddd", 
+                                $id_pedido, 
+                                $id_producto, 
+                                $cantidad,
+                                $precio_unitario,
+                                $subtotal_detalle
+                            );
+                            
+                            if (!$stmt_detalle->execute()) {
+                                throw new Exception("Error insertando detalle: " . $stmt_detalle->error);
+                            }
+                            
+                            $productos_insertados++;
+                            $subtotal_acumulado += $subtotal_detalle;
+                            
+                            $detalles_pedido[] = [
+                                'id_producto' => $id_producto,
+                                'nombre' => $nombre_producto,
+                                'cantidad' => $cantidad,
+                                'precio_unitario' => $precio_unitario,
+                                'subtotal' => $subtotal_detalle
+                            ];
+                            
+                            // Formatear para EmailJS
+                            $lista_productos_email[] = "{$nombre_producto}: {$cantidad} x $" . number_format($precio_unitario, 2);
+                        }
+                    }
+                }
+                
+                // Actualizar totales en pedido
+                $stmt_update = $conn->prepare("
+                    UPDATE pedidos_proveedor 
+                    SET subtotal_productos = ?, total_pedido = ?
+                    WHERE id_pedido = ?
+                ");
+                $stmt_update->bind_param("ddi", $subtotal_acumulado, $subtotal_acumulado, $id_pedido);
+                $stmt_update->execute();
+                
+                // 4. COMMIT - Todo exitoso
+                $conn->commit();
+                
+                // Preparar datos para EmailJS
+                $datos_email = [
+                    'proveedor_nombre' => $proveedor_nombre,
+                    'restaurante_nombre' => $nombre_restaurante,
+                    'lista_productos' => implode("\n", $lista_productos_email),
+                    'total_pedido' => number_format($subtotal_acumulado, 2),
+                    'id_pedido' => $id_pedido,
+                    'notas' => $notas_pedido
+                ];
+                
+                // Respuesta exitosa
+                $respuesta = [
+                    'success' => true,
+                    'message' => 'Pedido B2B creado exitosamente',
+                    'id_pedido' => $id_pedido,
+                    'datos_email' => $datos_email,
+                    'total_productos' => $productos_insertados,
+                    'total_pedido' => $subtotal_acumulado,
+                    'detalles' => $detalles_pedido,
+                    'fecha_creacion' => date('Y-m-d H:i:s')
+                ];
+                
+            } catch (Exception $e) {
+                // ROLLBACK - Algo falló
+                $conn->rollback();
+                
+                $respuesta = [
+                    'success' => false,
+                    'message' => 'Error en transacción: ' . $e->getMessage()
+                ];
+                
+                error_log("Error transaccional en pedido B2B: " . $e->getMessage());
+            }
+        }
+        
+        // Retornar JSON (siempre AJAX para B2B)
+        header('Content-Type: application/json');
+        echo json_encode($respuesta);
+        exit();
+    }
+    
+    // =================================================================
+    // ACCIÓN: Crear Pedido de Re-stock Interno (Original)
+    // =================================================================
     if ($action == 'crear_pedido') {
         $proveedor = $_POST['proveedor'];
         $fecha_estimada = $_POST['fecha_estimada'];
@@ -37,31 +202,95 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // Crear el pedido
         $stmt_pedido = $conn->prepare("
-            INSERT INTO pedidos_restock (id_res, proveedor, fecha_estimada, notas, estado, fecha_creacion)
-            VALUES (?, ?, ?, ?, 'pendiente', NOW())
+            INSERT INTO pedidos_restock (id_res, proveedor, fecha_estimada, notas, estado, fecha_creacion, creado_por)
+            VALUES (?, ?, ?, ?, 'pendiente', NOW(), ?)
         ");
-        $stmt_pedido->bind_param("isss", $id_res, $proveedor, $fecha_estimada, $notas);
+        $stmt_pedido->bind_param("isssi", $id_res, $proveedor, $fecha_estimada, $notas, $id_usuario);
+        
+        $respuesta = [];
         
         if ($stmt_pedido->execute()) {
             $id_pedido = $conn->insert_id;
             
             // Agregar productos al pedido
+            $productos_insertados = 0;
+            $detalles_pedido = [];
             if (isset($_POST['productos']) && is_array($_POST['productos'])) {
                 foreach ($_POST['productos'] as $id_inv => $cantidad) {
                     if ($cantidad > 0) {
+                        // Obtener nombre del insumo
+                        $stmt_nombre = $conn->prepare("SELECT nombre_insumo FROM inventario WHERE id_inv = ?");
+                        $stmt_nombre->bind_param("i", $id_inv);
+                        $stmt_nombre->execute();
+                        $result_nombre = $stmt_nombre->get_result();
+                        $nombre_insumo = $result_nombre->fetch_assoc()['nombre_insumo'] ?? 'Insumo';
+                        
                         $stmt_detalle = $conn->prepare("
                             INSERT INTO pedido_detalle (id_pedido, id_inv, cantidad_solicitada)
                             VALUES (?, ?, ?)
                         ");
                         $stmt_detalle->bind_param("iid", $id_pedido, $id_inv, $cantidad);
-                        $stmt_detalle->execute();
+                        if ($stmt_detalle->execute()) {
+                            $productos_insertados++;
+                            $detalles_pedido[] = [
+                                'nombre' => $nombre_insumo,
+                                'cantidad' => $cantidad
+                            ];
+                        }
                     }
                 }
             }
             
-            header("Location: restock_inventario.php?status=pedido_creado");
+            // TRIGGER REPLICADO EN PHP: actualizar_total_productos_pedido
+            $stmt_update_total = $conn->prepare("
+                UPDATE pedidos_restock 
+                SET total_productos = (
+                    SELECT COUNT(*) 
+                    FROM pedido_detalle 
+                    WHERE id_pedido = ?
+                )
+                WHERE id_pedido = ?
+            ");
+            $stmt_update_total->bind_param("ii", $id_pedido, $id_pedido);
+            if (!$stmt_update_total->execute()) {
+                error_log("Error actualizando total_productos para pedido $id_pedido: " . $conn->error);
+            }
+            
+            // Preparar respuesta exitosa
+            $respuesta = [
+                'success' => true,
+                'message' => 'Pedido creado exitosamente',
+                'id_pedido' => $id_pedido,
+                'proveedor' => $proveedor,
+                'fecha_estimada' => $fecha_estimada,
+                'notas' => $notas,
+                'total_productos' => $productos_insertados,
+                'detalles' => $detalles_pedido,
+                'fecha_creacion' => date('Y-m-d H:i:s')
+            ];
+            
+        } else {
+            // Error al crear el pedido
+            $respuesta = [
+                'success' => false,
+                'message' => 'Error al crear el pedido: ' . $conn->error
+            ];
+        }
+        
+        // Si es AJAX, retornar JSON
+        if (esAjax()) {
+            header('Content-Type: application/json');
+            echo json_encode($respuesta);
             exit();
         }
+        
+        // Si no es AJAX, hacer redirect tradicional
+        if ($respuesta['success']) {
+            header("Location: restock_inventario.php?status=pedido_creado");
+        } else {
+            header("Location: restock_inventario.php?status=error&msg=" . urlencode($respuesta['message']));
+        }
+        exit();
     }
 }
 
@@ -422,5 +651,562 @@ $pedidos_recientes = $stmt_pedidos->get_result();
             </a>
         </div>
     </div>
+    
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Notificaciones y manejo de pedidos -->
+    <script>
+    /**
+     * =========================================================
+     * MÓDULO DE CREACIÓN DE PEDIDOS - SALUD JUÁREZ
+     * =========================================================
+     * Conexión Frontend → Backend con EmailJS condicional
+     */
+    
+    // Configuración de EmailJS
+    const EMAILJS_CONFIG = {
+        serviceID: 'service_kchdp9f',
+        templateID: 'template_tnrferf',
+        publicKey: 'VkhEAneBLv5m5rOgO'
+    };
+    
+    // Inicializar EmailJS
+    emailjs.init(EMAILJS_CONFIG.publicKey);
+    
+    /**
+     * Sistema de Notificaciones Flotantes (sj-notificacion)
+     * @param {string} mensaje - Texto a mostrar
+     * @param {string} tipo - 'success', 'warning', 'error', 'info'
+     * @param {number} duracion - Milisegundos visible (default: 4000)
+     */
+    function mostrarNotificacion(mensaje, tipo = 'info', duracion = 4000) {
+        // Colores según tipo
+        const colores = {
+            success: { bg: '#27ae60', border: '#1e8449', icon: '✅' },
+            warning: { bg: '#f39c12', border: '#d68910', icon: '⚠️' },
+            error: { bg: '#e74c3c', border: '#c0392b', icon: '❌' },
+            info: { bg: '#3498db', border: '#2980b9', icon: 'ℹ️' }
+        };
+        
+        const estilo = colores[tipo] || colores.info;
+        
+        // Crear elemento de notificación
+        const notificacion = document.createElement('div');
+        notificacion.className = 'sj-notificacion sj-notificacion-' + tipo;
+        notificacion.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${estilo.bg};
+            color: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            border-left: 5px solid ${estilo.border};
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-family: inherit;
+            font-weight: 500;
+            z-index: 10000;
+            max-width: 350px;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        `;
+        
+        notificacion.innerHTML = `
+            <span style="font-size: 20px;">${estilo.icon}</span>
+            <span>${mensaje}</span>
+        `;
+        
+        document.body.appendChild(notificacion);
+        
+        // Animación de entrada
+        requestAnimationFrame(() => {
+            notificacion.style.transform = 'translateX(0)';
+        });
+        
+        // Animación de salida
+        setTimeout(() => {
+            notificacion.style.transform = 'translateX(120%)';
+            setTimeout(() => {
+                if (notificacion.parentNode) {
+                    notificacion.parentNode.removeChild(notificacion);
+                }
+            }, 400);
+        }, duracion);
+    }
+    
+    /**
+     * Enviar correo vía EmailJS
+     * @param {Object} datosPedido - Datos del pedido para el template
+     * @returns {Promise<Object>} - Resultado del envío
+     */
+    async function enviarEmailProveedor(datosPedido) {
+        const templateParams = {
+            to_name: datosPedido.proveedor,
+            to_email: datosPedido.email_proveedor || 'proveedor@ejemplo.com',
+            restaurant_name: datosPedido.nombre_restaurante,
+            pedido_id: datosPedido.id_pedido,
+            fecha_pedido: new Date().toLocaleDateString('es-MX'),
+            productos_lista: datosPedido.productos_lista,
+            total_productos: datosPedido.total_productos,
+            notas: datosPedido.notas || 'Sin notas adicionales'
+        };
+        
+        try {
+            const response = await emailjs.send(
+                EMAILJS_CONFIG.serviceID,
+                EMAILJS_CONFIG.templateID,
+                templateParams
+            );
+            return { success: true, response };
+        } catch (error) {
+            console.error('Error enviando email:', error);
+            return { success: false, error };
+        }
+    }
+    
+    /**
+     * Crear tarjeta de pedido dinámicamente
+     * @param {Object} pedido - Datos del pedido
+     */
+    function agregarPedidoAlDOM(pedido) {
+        const listaPedidos = document.querySelector('.pedidos-list');
+        if (!listaPedidos) return;
+        
+        // Crear elemento del pedido
+        const pedidoDiv = document.createElement('div');
+        pedidoDiv.className = 'pedido-item';
+        pedidoDiv.style.cssText = `
+            border-left: 4px solid #2D5A27;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            border-radius: 0 8px 8px 0;
+            animation: fadeInSlide 0.5s ease;
+        `;
+        
+        // Formatear fecha
+        const fecha = new Date(pedido.fecha_creacion).toLocaleDateString('es-MX', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+        
+        // Generar HTML de productos
+        let productosHTML = '';
+        if (pedido.detalles && pedido.detalles.length > 0) {
+            productosHTML = pedido.detalles.map(d => 
+                `<li>${d.nombre}: ${d.cantidad}</li>`
+            ).join('');
+        }
+        
+        pedidoDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <strong style="color: #2D5A27; font-size: 16px;">
+                    📦 Pedido #${pedido.id_pedido} - ${pedido.proveedor}
+                </strong>
+                <span class="estado-badge estado-pendiente">PENDIENTE</span>
+            </div>
+            <div style="color: #666; font-size: 14px; margin-bottom: 8px;">
+                <strong>Fecha:</strong> ${fecha} | 
+                <strong>Entrega estimada:</strong> ${pedido.fecha_estimada}
+            </div>
+            <div style="color: #666; font-size: 14px; margin-bottom: 8px;">
+                <strong>Productos (${pedido.total_productos}):</strong>
+                <ul style="margin: 5px 0; padding-left: 20px;">
+                    ${productosHTML}
+                </ul>
+            </div>
+            ${pedido.notas ? `<div style="color: #888; font-size: 13px; font-style: italic;">📝 ${pedido.notas}</div>` : ''}
+        `;
+        
+        // Agregar al inicio de la lista
+        const titulo = listaPedidos.querySelector('h2');
+        if (titulo && titulo.nextSibling) {
+            listaPedidos.insertBefore(pedidoDiv, titulo.nextSibling);
+        } else {
+            listaPedidos.appendChild(pedidoDiv);
+        }
+        
+        // Agregar animación CSS si no existe
+        if (!document.getElementById('animaciones-pedidos')) {
+            const style = document.createElement('style');
+            style.id = 'animaciones-pedidos';
+            style.textContent = `
+                @keyframes fadeInSlide {
+                    from {
+                        opacity: 0;
+                        transform: translateX(-30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateX(0);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    
+    /**
+     * Enviar correo B2B vía EmailJS - Template Especializado
+     * Template: "Alerta de Solicitud de Re-stock B2B"
+     * @param {Object} datosEmail - Datos del pedido B2B
+     * @returns {Promise<Object>} - Resultado del envío
+     */
+    async function enviarEmailB2B(datosEmail) {
+        // Template específico para B2B (puede ser diferente al general)
+        const templateB2B = 'template_tnrferf'; // Template de Alerta B2B
+        
+        const templateParams = {
+            // Variables mapeadas para el template EmailJS
+            proveedor_nombre: datosEmail.proveedor_nombre,
+            restaurante_nombre: datosEmail.restaurante_nombre,
+            lista_productos: datosEmail.lista_productos,
+            total_pedido: datosEmail.total_pedido,
+            id_pedido: datosEmail.id_pedido,
+            notas: datosEmail.notas || 'Sin notas adicionales',
+            
+            // Variables adicionales útiles
+            fecha_pedido: new Date().toLocaleDateString('es-MX', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            }),
+            hora_pedido: new Date().toLocaleTimeString('es-MX', {
+                hour: '2-digit',
+                minute: '2-digit'
+            })
+        };
+        
+        try {
+            const response = await emailjs.send(
+                EMAILJS_CONFIG.serviceID,
+                templateB2B,
+                templateParams
+            );
+            return { success: true, response };
+        } catch (error) {
+            console.error('Error enviando email B2B:', error);
+            return { success: false, error };
+        }
+    }
+    
+    /**
+     * Manejar envío del formulario de pedido B2B (Transaccional)
+     * @param {Event} e - Evento del formulario
+     */
+    async function manejarEnvioPedidoB2B(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const btnTextoOriginal = submitBtn.innerHTML;
+        
+        // Agregar action B2B
+        formData.append('action', 'crear_pedido_b2b');
+        
+        // Validar que haya al menos un producto seleccionado
+        let hayProductos = false;
+        let productosCount = 0;
+        formData.forEach((value, key) => {
+            if (key.startsWith('productos[') && parseFloat(value) > 0) {
+                hayProductos = true;
+                productosCount++;
+            }
+        });
+        
+        if (!hayProductos) {
+            mostrarNotificacion('Debes seleccionar al menos un producto para el pedido B2B', 'warning');
+            return;
+        }
+        
+        // Deshabilitar botón y mostrar estado de carga
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '📤 Procesando pedido B2B...';
+        
+        try {
+            // 1. ENVIAR PETICIÓN AL BACKEND (PHP) - CON TRANSACCIÓN
+            const response = await fetch('restock_inventario.php', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const resultado = await response.json();
+            
+            // 2. VERIFICAR RESPUESTA DEL PHP (success: true/false)
+            if (resultado.success === true) {
+                // Pedido guardado exitosamente en BD
+                
+                // 3. DISPARAR EMAILJS CONDICIONALMENTE (solo si PHP success)
+                let emailEnviado = false;
+                if (resultado.datos_email) {
+                    const emailResult = await enviarEmailB2B(resultado.datos_email);
+                    emailEnviado = emailResult.success;
+                }
+                
+                // 4. MOSTRAR NOTIFICACIÓN SEGÚN ESTADO
+                if (emailEnviado) {
+                    // ÉXITO TOTAL: Pedido guardado + Email enviado
+                    mostrarNotificacion(
+                        '✅ Pedido guardado y proveedor notificado', 
+                        'success', 
+                        5000
+                    );
+                } else {
+                    // ÉXITO PARCIAL: Pedido guardado pero email falló
+                    mostrarNotificacion(
+                        '⚠️ Pedido guardado, pero falló la notificación al proveedor', 
+                        'warning', 
+                        6000
+                    );
+                }
+                
+                // 5. ACTUALIZAR DOM DINÁMICAMENTE (sin F5)
+                agregarPedidoB2BAlDOM(resultado);
+                
+                // 6. LIMPIAR FORMULARIO
+                form.reset();
+                document.querySelectorAll('.cantidad-input').forEach(input => {
+                    input.value = '';
+                });
+                
+            } else {
+                // ERROR DEL PHP: Transacción falló o datos inválidos
+                mostrarNotificacion(
+                    '❌ Error al procesar la solicitud: ' + (resultado.message || 'Error desconocido'), 
+                    'error', 
+                    6000
+                );
+            }
+            
+        } catch (error) {
+            console.error('Error en envío B2B:', error);
+            mostrarNotificacion(
+                '❌ Error de conexión. Verifica tu conexión e intenta de nuevo.', 
+                'error', 
+                6000
+            );
+        } finally {
+            // Restaurar botón
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = btnTextoOriginal;
+        }
+    }
+    
+    /**
+     * Crear tarjeta de pedido B2B dinámicamente en el DOM
+     * @param {Object} pedido - Datos del pedido B2B
+     */
+    function agregarPedidoB2BAlDOM(pedido) {
+        const listaPedidos = document.querySelector('.pedidos-list');
+        if (!listaPedidos) return;
+        
+        // Crear elemento del pedido
+        const pedidoDiv = document.createElement('div');
+        pedidoDiv.className = 'pedido-item pedido-b2b-nuevo';
+        pedidoDiv.style.cssText = `
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #fff5f5, #ffeaea);
+            border-radius: 0 8px 8px 0;
+            animation: fadeInSlide 0.5s ease;
+            box-shadow: 0 2px 8px rgba(231, 76, 60, 0.15);
+        `;
+        
+        // Formatear fecha
+        const fecha = new Date().toLocaleDateString('es-MX', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+        
+        // Generar HTML de productos para B2B
+        let productosHTML = '';
+        if (pedido.detalles && pedido.detalles.length > 0) {
+            productosHTML = pedido.detalles.map(d => 
+                `<li>${d.nombre}: ${d.cantidad} x $${parseFloat(d.precio_unitario).toFixed(2)}</li>`
+            ).join('');
+        }
+        
+        const totalFormateado = parseFloat(pedido.total_pedido || 0).toFixed(2);
+        
+        pedidoDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <strong style="color: #c0392b; font-size: 16px;">
+                    🏢 Pedido B2B #${pedido.id_pedido}
+                </strong>
+                <span class="estado-badge estado-pendiente">PENDIENTE</span>
+            </div>
+            <div style="color: #666; font-size: 14px; margin-bottom: 8px;">
+                <strong>Proveedor:</strong> ${pedido.datos_email?.proveedor_nombre || 'Proveedor B2B'}
+            </div>
+            <div style="color: #666; font-size: 14px; margin-bottom: 8px;">
+                <strong>Productos (${pedido.total_productos}):</strong>
+                <ul style="margin: 5px 0; padding-left: 20px;">
+                    ${productosHTML}
+                </ul>
+            </div>
+            <div style="color: #27ae60; font-size: 16px; font-weight: bold; margin-bottom: 8px;">
+                Total: $${totalFormateado}
+            </div>
+            <div style="color: #888; font-size: 12px;">
+                Creado: ${fecha} • Transacción completada
+            </div>
+        `;
+        
+        // Agregar al inicio de la lista
+        const titulo = listaPedidos.querySelector('h2');
+        if (titulo && titulo.nextSibling) {
+            listaPedidos.insertBefore(pedidoDiv, titulo.nextSibling);
+        } else {
+            listaPedidos.appendChild(pedidoDiv);
+        }
+        
+        // Scroll suave al nuevo pedido
+        pedidoDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    /**
+     * Manejar envío del formulario de pedido (Original - Re-stock interno)
+     * @param {Event} e - Evento del formulario
+     */
+    async function manejarEnvioPedido(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const btnTextoOriginal = submitBtn.innerHTML;
+        
+        // Validar que haya al menos un producto seleccionado
+        const productos = formData.getAll('productos[]');
+        let hayProductos = false;
+        formData.forEach((value, key) => {
+            if (key.startsWith('productos[') && parseFloat(value) > 0) {
+                hayProductos = true;
+            }
+        });
+        
+        if (!hayProductos) {
+            mostrarNotificacion('Debes seleccionar al menos un producto para el pedido', 'warning');
+            return;
+        }
+        
+        // Deshabilitar botón y mostrar estado de carga
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '📤 Enviando pedido...';
+        
+        try {
+            // 1. ENVIAR PETICIÓN AL BACKEND (PHP)
+            const response = await fetch('restock_inventario.php', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const resultado = await response.json();
+            
+            // 2. VERIFICAR RESPUESTA DEL PHP
+            if (resultado.success) {
+                // Pedido guardado exitosamente
+                
+                // Preparar datos para EmailJS
+                const datosEmail = {
+                    proveedor: resultado.proveedor,
+                    email_proveedor: formData.get('email_proveedor') || '',
+                    nombre_restaurante: '<?php echo htmlspecialchars($nombre_restaurante); ?>',
+                    id_pedido: resultado.id_pedido,
+                    productos_lista: resultado.detalles 
+                        ? resultado.detalles.map(d => `${d.nombre}: ${d.cantidad}`).join('\n')
+                        : 'Ver detalles en el sistema',
+                    total_productos: resultado.total_productos,
+                    notas: resultado.notas
+                };
+                
+                // 3. DISPARAR EMAILJS CONDICIONALMENTE
+                const emailResult = await enviarEmailProveedor(datosEmail);
+                
+                if (emailResult.success) {
+                    // ÉXITO TOTAL: Pedido guardado + Email enviado
+                    mostrarNotificacion(
+                        '✅ Pedido guardado y proveedor notificado correctamente', 
+                        'success', 
+                        5000
+                    );
+                } else {
+                    // ÉXITO PARCIAL: Pedido guardado pero email falló
+                    mostrarNotificacion(
+                        '⚠️ Pedido guardado, pero falló la notificación por correo', 
+                        'warning', 
+                        6000
+                    );
+                }
+                
+                // 4. ACTUALIZAR DOM DINÁMICAMENTE (sin F5)
+                agregarPedidoAlDOM(resultado);
+                
+                // Limpiar formulario
+                form.reset();
+                
+                // Resetear inputs de cantidad
+                document.querySelectorAll('.cantidad-input').forEach(input => {
+                    input.value = '';
+                });
+                
+            } else {
+                // Error del PHP
+                mostrarNotificacion(
+                    '❌ Error al procesar la solicitud: ' + resultado.message, 
+                    'error', 
+                    6000
+                );
+            }
+            
+        } catch (error) {
+            console.error('Error en envío:', error);
+            mostrarNotificacion(
+                '❌ Error de conexión. Verifica tu conexión a internet e intenta de nuevo.', 
+                'error', 
+                6000
+            );
+        } finally {
+            // Restaurar botón
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = btnTextoOriginal;
+        }
+    }
+    
+    // Configurar event listeners cuando DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Formulario de re-stock interno (original)
+        const formPedido = document.querySelector('form[action="restock_inventario.php"]:not([data-mode="b2b"])');
+        if (formPedido) {
+            formPedido.addEventListener('submit', manejarEnvioPedido);
+        }
+        
+        // 2. Formulario B2B (transaccional con EmailJS)
+        const formPedidoB2B = document.querySelector('form[data-mode="b2b"]');
+        if (formPedidoB2B) {
+            formPedidoB2B.addEventListener('submit', manejarEnvioPedidoB2B);
+        }
+        
+        // Debug: Mostrar qué formularios se detectaron
+        console.log('📋 Formularios detectados:', {
+            interno: !!formPedido,
+            b2b: !!formPedidoB2B
+        });
+    });
+    </script>
 </body>
 </html>

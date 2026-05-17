@@ -369,70 +369,32 @@ class SolicitudPedidoProveedor {
     /**
      * Enviar correo vía EmailJS - Template: Alerta de Solicitud de Re-stock B2B
      * Template ID: template_p8hu9qn
-     * @param {Object} datosEmail - Datos del pedido formateados
+     * @param {Object} params - Datos del pedido formateados
      * @returns {Promise<boolean>} - true si se envió correctamente
      */
-    async enviarEmailJS(datosEmail) {
-        // Configuración de EmailJS
-        const EMAILJS_CONFIG = {
-            serviceID: 'service_t8yl29t',      // Service ID actual
-            templateID: 'template_p8hu9qn',   // Template: Alerta de Solicitud de Re-stock B2B
-            publicKey: 'bJjfLm9SYVJvjQSNk'     // Public Key
-        };
-        
-        // Verificar si EmailJS está disponible
-        if (typeof emailjs === 'undefined') {
-            console.error('EmailJS no está cargado');
-            return false;
-        }
-        
-        // FIX: Forzar inicialización con publicKey antes de enviar
-        emailjs.init(EMAILJS_CONFIG.publicKey);
-        console.log('📧 EmailJS: Inicializado con Public Key');
-        
-        // Preparar parámetros para el template
-        // Variables mapeadas según el template EmailJS:
-        // {{nombre_empresa_proveedor}}, {{nombre_restaurante}}, {{direccion_entrega}},
-        // {{metodo_pago}}, {{notas_pedido}}, {{cost.shipping}}, {{cost.tax}}, {{cost.total}}
-        const templateParams = {
-            nombre_empresa_proveedor: datosEmail.nombre_empresa_proveedor,
-            nombre_restaurante: datosEmail.nombre_restaurante,
-            direccion_entrega: datosEmail.direccion_entrega,
-            metodo_pago: datosEmail.metodo_pago,
-            notas_pedido: datosEmail.notas_pedido,
-            'cost.shipping': datosEmail.cost_shipping,  // Notación con punto
-            'cost.tax': datosEmail.cost_tax,
-            'cost.total': datosEmail.cost_total,
-            lista_productos: datosEmail.lista_productos,
-            numero_pedido: datosEmail.numero_pedido,
-            id_pedido: datosEmail.id_pedido,
-            fecha_pedido: new Date().toLocaleDateString('es-MX', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-            })
-        };
-        
+    async enviarEmailJS(params) {
+        // 1. Forzamos la fecha y hora exacta de la solicitud en los parámetros
+        params.fecha_pedido = new Date().toLocaleString('es-MX', { timeZone: 'America/Ciudad_Juarez' });
+
         try {
-            console.log('📤 EmailJS: Intentando enviar con Service:', EMAILJS_CONFIG.serviceID);
+            // 2. IMPORTANTE: Usa la llave directamente aquí para evitar el 404
+            const PUBLIC_KEY = "bJjfLm9SYVJvjQSNk";
+            const CORRECT_SERVICE_ID = "service_t8yl29t";
             
-            // FIX: Pasar publicKey como 4to parámetro para evitar 404 Account not found
+            console.log("📤 Iniciando transferencia a EmailJS para el Pedido:", params.id_pedido);
+            console.log("🔧 Validación: Service ID =", CORRECT_SERVICE_ID);
+            console.log("🔧 Validación: Template ID =", "template_p8hu9qn");
+
             const response = await emailjs.send(
-                EMAILJS_CONFIG.serviceID,
-                EMAILJS_CONFIG.templateID,
-                templateParams,
-                EMAILJS_CONFIG.publicKey  // <--- Public Key forzada aquí
+                CORRECT_SERVICE_ID, 
+                "template_p8hu9qn", 
+                params, 
+                PUBLIC_KEY // Pasamos la llave aquí para matar el error 404
             );
-            
-            console.log('✅ EmailJS: Notificación enviada correctamente', response.status, response.text);
+
             return true;
-            
         } catch (error) {
-            console.error('❌ EmailJS: Error detallado:', error);
-            // Check específico para error 404
-            if (error.status === 404) {
-                console.error('⚠️ Error 404: Verifica que la Public Key sea correcta y no tenga espacios en blanco');
-            }
+            console.error("❌ Fallo en la transferencia de datos:", error);
             return false;
         }
     }

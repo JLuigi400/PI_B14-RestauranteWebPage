@@ -160,6 +160,9 @@ try {
         $result_info = $stmt_info->get_result();
         $info = $result_info->fetch_assoc();
         
+        // Log de datos obtenidos para debug
+        error_log("[DEBUG] Datos proveedor obtenidos: " . json_encode($info));
+        
         // Calcular impuestos (16% IVA)
         $tasa_iva = 0.16;
         $impuestos = $subtotal_productos * $tasa_iva;
@@ -171,20 +174,39 @@ try {
             $lista_productos .= "• " . $prod['nombre_producto'] . ": " . $prod['cantidad'] . " x $" . number_format($prod['precio_unitario'], 2) . " = $" . number_format($prod['subtotal'], 2) . "\n";
         }
 
-        // Preparar datos_email para EmailJS - Template: Alerta de Solicitud de Re-stock B2B
-        // Variables mapeadas: {{nombre_empresa_proveedor}}, {{nombre_restaurante}}, {{direccion_entrega}}, etc.
+        // Preparar datos_email para EmailJS - Template de Aris
+        // Variables requeridas según especificación:
+        // {{correo_proveedor}}, {{nombre_empresa_proveedor}}, {{nombre_restaurante}}, 
+        // {{nombre_usuario}}, {{id_pedido}}, {{fecha_pedido}}, {{tabla_productos}},
+        // {{total_pedido}}, {{direccion_entrega}}, {{metodo_pago}}, {{notas_pedido}}
         $datos_email = [
+            // Datos del proveedor (destinatario)
+            'correo_proveedor' => $info['email_proveedor'] ?? '',  // To Email
             'nombre_empresa_proveedor' => $info['nombre_empresa'] ?? 'Proveedor',
+            
+            // Datos del restaurante/solicitante
             'nombre_restaurante' => $info['nombre_restaurante'] ?? 'Restaurante',
+            'nombre_usuario' => 'Usuario del Sistema',  // Placeholder - requiere tabla adicional
+            
+            // Datos del pedido
+            'id_pedido' => $id_pedido,
+            'fecha_pedido' => date('d/m/Y H:i'),
+            
+            // Productos (tabla HTML para el email)
+            'tabla_productos' => $lista_productos,  // Formato HTML/texto con productos
+            'total_pedido' => number_format($total_pedido, 2),  // Total con IVA
+            
+            // Información adicional
             'direccion_entrega' => $direccion_entrega,
             'metodo_pago' => $metodo_pago,
             'notas_pedido' => $notas_pedido ?: 'Sin notas adicionales',
+            
+            // Campos legacy (mantener por compatibilidad)
             'lista_productos' => $lista_productos,
-            'cost_shipping' => number_format($costo_envio, 2),  // {{cost.shipping}}
-            'cost_tax' => number_format($impuestos, 2),          // {{cost.tax}}
-            'cost_total' => number_format($total_pedido, 2),     // {{cost.total}}
+            'cost_shipping' => number_format($costo_envio, 2),
+            'cost_tax' => number_format($impuestos, 2),
+            'cost_total' => number_format($total_pedido, 2),
             'subtotal' => number_format($subtotal_productos, 2),
-            'id_pedido' => $id_pedido,
             'numero_pedido' => 'REQ-' . date('Y') . '-' . str_pad($id_pedido, 4, '0', STR_PAD_LEFT)
         ];
 

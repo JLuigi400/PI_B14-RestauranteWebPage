@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../PHP/navbar.php';
+include '../PHP/db_config.php';
 
 // Verificar que el usuario sea dueño (rol 2)
 if (!isset($_SESSION['id_usu']) || $_SESSION['id_rol'] != 2) {
@@ -9,6 +10,37 @@ if (!isset($_SESSION['id_usu']) || $_SESSION['id_rol'] != 2) {
 }
 
 $id_usuario = $_SESSION['id_usu'];
+
+// Obtener nombre del usuario desde sesión y perfiles
+$nombre_usuario = 'Usuario del Sistema';
+if (isset($_SESSION['id_usu'])) {
+    $sql_usuario = "SELECT u.username_usu, p.nombre_per, p.apellidos_per 
+                    FROM usuarios u 
+                    LEFT JOIN perfiles p ON u.id_usu = p.id_usu 
+                    WHERE u.id_usu = ?";
+    $stmt_usuario = $conn->prepare($sql_usuario);
+    $stmt_usuario->bind_param("i", $id_usuario);
+    $stmt_usuario->execute();
+    $result_usuario = $stmt_usuario->get_result();
+    if ($usuario_data = $result_usuario->fetch_assoc()) {
+        if ($usuario_data['nombre_per']) {
+            $nombre_usuario = $usuario_data['nombre_per'] . ' ' . $usuario_data['apellidos_per'];
+        } else {
+            $nombre_usuario = $usuario_data['username_usu'];
+        }
+    }
+}
+
+// Obtener nombre del restaurante
+$nombre_restaurante = 'Mi Restaurante';
+$sql_restaurante = "SELECT nombre_res FROM restaurante WHERE id_usu = ?";
+$stmt_restaurante = $conn->prepare($sql_restaurante);
+$stmt_restaurante->bind_param("i", $id_usuario);
+$stmt_restaurante->execute();
+$result_restaurante = $stmt_restaurante->get_result();
+if ($restaurante_data = $result_restaurante->fetch_assoc()) {
+    $nombre_restaurante = $restaurante_data['nombre_res'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -204,6 +236,10 @@ $id_usuario = $_SESSION['id_usu'];
     </style>
 </head>
 <body>
+    <!-- Elementos hidden para datos de sesión (leídos por JS para EmailJS) -->
+    <input type="hidden" id="nombre_res_display" value="<?php echo htmlspecialchars($nombre_restaurante); ?>">
+    <input type="hidden" id="nombre_usuario_display" value="<?php echo htmlspecialchars($nombre_usuario); ?>">
+    
     <div class="sj-solicitud-container">
         <!-- Header -->
         <div class="sj-solicitud-header">
